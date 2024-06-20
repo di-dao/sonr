@@ -63,7 +63,8 @@ func (acc EthAccount) GetAccountNumber() uint64 {
 
 // GetAddress returns account address.
 func (acc EthAccount) GetAddress() sdk.AccAddress {
-	return acc.BaseAccount.Address
+	addr, _ := sdk.AccAddressFromBech32(acc.BaseAccount.Address)
+	return addr
 }
 
 // GetBaseAccount returns base account.
@@ -73,7 +74,7 @@ func (acc EthAccount) GetBaseAccount() *authtypes.BaseAccount {
 
 // GetPubKey returns the PubKey
 func (acc EthAccount) GetPubKey() cryptotypes.PubKey {
-	return acc.BaseAccount.PubKey
+	return acc.GetBaseAccount().GetPubKey()
 }
 
 // GetSequence returns the sequence
@@ -92,13 +93,32 @@ func (acc EthAccount) GetCodeHash() common.Hash {
 }
 
 // SetAccountNumber sets the account number
-func (acc *EthAccount) SetAccountNumber(accNum uint64) {
+func (acc *EthAccount) SetAccountNumber(accNum uint64) error {
 	acc.BaseAccount.AccountNumber = accNum
+	return nil
+}
+
+// SetAddress sets the address
+func (acc *EthAccount) SetAddress(addr sdk.AccAddress) error {
+	acc.BaseAccount.Address = addr.String()
+	return nil
 }
 
 // SetCodeHash sets the account code hash to the EthAccount fields
 func (acc *EthAccount) SetCodeHash(codeHash common.Hash) error {
 	acc.CodeHash = codeHash.Hex()
+	return nil
+}
+
+// SetPubKey sets the pubkey
+func (acc *EthAccount) SetPubKey(pubkey cryptotypes.PubKey) error {
+	acc.BaseAccount.PubKey = codectypes.UnsafePackAny(pubkey)
+	return nil
+}
+
+// SetSequence sets the sequence
+func (acc *EthAccount) SetSequence(seq uint64) error {
+	acc.BaseAccount.Sequence = seq
 	return nil
 }
 
@@ -113,4 +133,14 @@ func (acc EthAccount) Type() int8 {
 // Stringreturns the string representation of the EthAccount
 func (acc EthAccount) String() string {
 	return acc.EthAddress().String()
+}
+
+// Validate checks if the Evmos account fields are valid
+func (acc EthAccount) Validate() error {
+	return nil
+}
+
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+func (acc EthAccount) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	return nil
 }
