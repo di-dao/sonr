@@ -181,10 +181,6 @@ func local_request_Query_ResolveIdentifier_0(ctx context.Context, marshaler runt
 
 }
 
-var (
-	filter_Query_LoginOptions_0 = &utilities.DoubleArray{Encoding: map[string]int{"origin": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
-
 func request_Query_LoginOptions_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryLoginOptionsRequest
 	var metadata runtime.ServerMetadata
@@ -207,11 +203,15 @@ func request_Query_LoginOptions_0(ctx context.Context, marshaler runtime.Marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "origin", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok = pathParams["handle"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "handle")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LoginOptions_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Handle, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "handle", err)
 	}
 
 	msg, err := client.LoginOptions(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -241,21 +241,21 @@ func local_request_Query_LoginOptions_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "origin", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok = pathParams["handle"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "handle")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LoginOptions_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Handle, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "handle", err)
 	}
 
 	msg, err := server.LoginOptions(ctx, &protoReq)
 	return msg, metadata, err
 
 }
-
-var (
-	filter_Query_RegisterOptions_0 = &utilities.DoubleArray{Encoding: map[string]int{"origin": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
 
 func request_Query_RegisterOptions_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryRegisterOptionsRequest
@@ -279,11 +279,15 @@ func request_Query_RegisterOptions_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "origin", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok = pathParams["handle"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "handle")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_RegisterOptions_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Handle, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "handle", err)
 	}
 
 	msg, err := client.RegisterOptions(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -313,11 +317,15 @@ func local_request_Query_RegisterOptions_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "origin", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	val, ok = pathParams["handle"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "handle")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_RegisterOptions_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Handle, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "handle", err)
 	}
 
 	msg, err := server.RegisterOptions(ctx, &protoReq)
@@ -597,9 +605,9 @@ var (
 
 	pattern_Query_ResolveIdentifier_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"did", "resolve", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_LoginOptions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"did", "login", "origin", "options"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_LoginOptions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"did", "login", "origin", "handle", "options"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_RegisterOptions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"did", "register", "origin", "options"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_RegisterOptions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"did", "register", "origin", "handle", "options"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

@@ -25,12 +25,12 @@ service Query {
 
     // LoginOptions queries the PublicKeyCredentialAttestationOptions for starting a login flow.
     rpc LoginOptions(QueryLoginOptionsRequest) returns (QueryLoginOptionsResponse) {
-        option (google.api.http).get = "/did/login/{origin}/options";
+        option (google.api.http).get = "/did/login/{origin}/{handle}/options";
     }
 
     // RegisterOptions queries the PublicKeyCredentialCreationOptions for starting a register flow.
     rpc RegisterOptions(QueryRegisterOptionsRequest) returns (QueryRegisterOptionsResponse) {
-        option (google.api.http).get = "/did/register/{origin}/options";
+        option (google.api.http).get = "/did/register/{origin}/{handle}/options";
     }
 }
 
@@ -81,7 +81,6 @@ message QueryLoginOptionsResponse {
 message QueryRegisterOptionsRequest {
     string origin = 1;
     string handle = 2;
-    bool generate = 3;
 }
 
 // QueryRegisterOptionsResponse is the response type for the Query/RegisterOptions RPC method.
