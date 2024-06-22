@@ -69,7 +69,7 @@ func (es *EncryptionScheme) Encrypt(acc *accumulator.Accumulator, vaultCID strin
 }
 
 // Decrypt is
-func (es *EncryptionScheme) Decrypt(vaultCID string, encryptedData []byte, witness *accumulator.MembershipWitness, secretKey *SecretKey) ([]byte, error) {
+func (es *EncryptionScheme) Decrypt(vaultCID string, encryptedData []byte, witness *accumulator.MembershipWitness, pubKey *accumulator.PublicKey) ([]byte, error) {
 	if len(encryptedData) < kyber768.CiphertextSize+AccumulatorMarshalledSize {
 		return nil, fmt.Errorf("invalid encrypted data: too short")
 	}
@@ -118,8 +118,8 @@ func (es *EncryptionScheme) Decrypt(vaultCID string, encryptedData []byte, witne
 	}
 
 	// Verify the witness using the decrypted accumulator and provided secret key
-	if err := witness.Verify(secretKey.PublicKey(), &decryptedAcc); err != nil {
-		return nil, fmt.Errorf("invalid witness: %w", err)
+	if err := witness.Verify(pubKey, &decryptedAcc); err != nil {
+		return nil, fmt.Errorf("unauthorized witness: %w", err)
 	}
 
 	return plaintext, nil
