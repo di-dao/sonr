@@ -6,7 +6,7 @@ import (
 
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/accumulator"
-	"github.com/di-dao/sonr/crypto/core/curves"
+	"github.com/di-dao/sonr/crypto/secret"
 )
 
 type Properties map[string]*accumulator.Accumulator
@@ -15,9 +15,15 @@ func NewProperties() Properties {
 	return make(Properties)
 }
 
+type Property struct {
+	Key        string `json:"key"`
+	Controller string `json:"controller"`
+	Value      []byte `json:"value"`
+}
+
 // Check validates the witness
 func (p Properties) Check(publicKey crypto.PublicKey, key string, witness []byte) bool {
-	sk, err := DeriveSecretKey(key, publicKey)
+	sk, err := secret.NewKey(key, publicKey)
 	if err != nil {
 		return false
 	}
@@ -35,7 +41,7 @@ func (p Properties) Check(publicKey crypto.PublicKey, key string, witness []byte
 
 // Set sets the property for the controller
 func (p Properties) Set(publicKey crypto.PublicKey, key, value string) ([]byte, error) {
-	sk, err := DeriveSecretKey(key, publicKey)
+	sk, err := secret.NewKey(key, publicKey)
 	if err != nil {
 		return nil, errors.Join(err, fmt.Errorf("failed to get secret key"))
 	}
@@ -53,7 +59,7 @@ func (p Properties) Set(publicKey crypto.PublicKey, key, value string) ([]byte, 
 
 // Remove unlinks the property from the controller
 func (p Properties) Remove(publicKey crypto.PublicKey, key, value string) error {
-	sk, err := DeriveSecretKey(key, publicKey)
+	sk, err := secret.NewKey(key, publicKey)
 	if err != nil {
 		return err
 	}
@@ -102,19 +108,4 @@ func (p Properties) Unmarshal(m map[string][]byte) error {
 		p[k] = acc
 	}
 	return nil
-}
-
-// deriveSecretKey derives the secret key from the keyshares
-func DeriveSecretKey(propertyKey string, pubKey crypto.PublicKey) (*crypto.SecretKey, error) {
-	// Concatenate the controller's public key and the property key
-	input := append(pubKey.Bytes(), []byte(propertyKey)...)
-	hash := []byte(input)
-
-	// Use the hash as the seed for the secret key
-	curve := curves.BLS12381(&curves.PointBls12381G1{})
-	key, err := new(accumulator.SecretKey).New(curve, hash[:])
-	if err != nil {
-		return nil, errors.Join(err, fmt.Errorf("failed to create secret key"))
-	}
-	return &crypto.SecretKey{SecretKey: key}, nil
 }

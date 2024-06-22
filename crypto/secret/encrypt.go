@@ -16,10 +16,11 @@ import (
 const AccumulatorMarshalledSize = 60
 
 type EncryptionScheme struct {
-	secretKey SecretKey
+	secretKey PrimaryKey
 }
 
-func NewEncryptionScheme(secretKey SecretKey) *EncryptionScheme {
+// NewEncryptionScheme creates a new NewEncryptionScheme
+func NewEncryptionScheme(secretKey PrimaryKey) *EncryptionScheme {
 	return &EncryptionScheme{
 		secretKey: secretKey,
 	}

@@ -1,20 +1,38 @@
 package secret
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/accumulator"
 	"github.com/di-dao/sonr/crypto/core/curves"
 )
 
-// SecretKey is the secret key for the BLS scheme
-type SecretKey struct {
+// PrimaryKey is the secret key for the BLS scheme
+type PrimaryKey struct {
 	*accumulator.SecretKey
 }
 
 // Element is the element for the BLS scheme
 type Element = accumulator.Element
 
+func NewKey(propertyKey string, pubKey crypto.PublicKey) (*PrimaryKey, error) {
+	// Concatenate the controller's public key and the property key
+	input := append(pubKey.Bytes(), []byte(propertyKey)...)
+	hash := []byte(input)
+
+	// Use the hash as the seed for the secret key
+	curve := curves.BLS12381(&curves.PointBls12381G1{})
+	key, err := new(accumulator.SecretKey).New(curve, hash[:])
+	if err != nil {
+		return nil, errors.Join(err, fmt.Errorf("failed to create secret key"))
+	}
+	return &PrimaryKey{SecretKey: key}, nil
+}
+
 // CreateAccumulator creates a new accumulator
-func (s *SecretKey) CreateAccumulator(values ...string) (*accumulator.Accumulator, error) {
+func (s *PrimaryKey) CreateAccumulator(values ...string) (*accumulator.Accumulator, error) {
 	curve := curves.BLS12381(&curves.PointBls12381G1{})
 	acc, err := new(accumulator.Accumulator).New(curve)
 	if err != nil {
@@ -28,7 +46,7 @@ func (s *SecretKey) CreateAccumulator(values ...string) (*accumulator.Accumulato
 }
 
 // CreateWitness creates a witness for the accumulator for a given value
-func (s *SecretKey) CreateWitness(acc *accumulator.Accumulator, value string) (*accumulator.MembershipWitness, error) {
+func (s *PrimaryKey) CreateWitness(acc *accumulator.Accumulator, value string) (*accumulator.MembershipWitness, error) {
 	curve := curves.BLS12381(&curves.PointBls12381G1{})
 	element := curve.Scalar.Hash([]byte(value))
 	mw, err := new(accumulator.MembershipWitness).New(element, acc, s.SecretKey)
@@ -39,12 +57,12 @@ func (s *SecretKey) CreateWitness(acc *accumulator.Accumulator, value string) (*
 }
 
 // ProveMembership proves that a value is a member of the accumulator
-func (s *SecretKey) VerifyWitness(acc *accumulator.Accumulator, witness *accumulator.MembershipWitness) error {
+func (s *PrimaryKey) VerifyWitness(acc *accumulator.Accumulator, witness *accumulator.MembershipWitness) error {
 	return witness.Verify(s.PublicKey(), acc)
 }
 
 // PublicKey returns the public key for the secret key
-func (s *SecretKey) PublicKey() *accumulator.PublicKey {
+func (s *PrimaryKey) PublicKey() *accumulator.PublicKey {
 	curve := curves.BLS12381(&curves.PointBls12381G1{})
 	pk, err := s.GetPublicKey(curve)
 	if err != nil {
@@ -54,7 +72,7 @@ func (s *SecretKey) PublicKey() *accumulator.PublicKey {
 }
 
 // UpdateAccumulator updates the accumulator with new values
-func (s *SecretKey) UpdateAccumulator(acc *accumulator.Accumulator, addValues, removeValues []string) (*accumulator.Accumulator, error) {
+func (s *PrimaryKey) UpdateAccumulator(acc *accumulator.Accumulator, addValues, removeValues []string) (*accumulator.Accumulator, error) {
 	acc, _, err := acc.Update(s.SecretKey, convertValuesToElements(addValues), convertValuesToElements(removeValues))
 	if err != nil {
 		return nil, err
