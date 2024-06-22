@@ -6,5 +6,4 @@ import (
 
 func Generate() {
 	set, err := mpc.GenerateKss()
-	set.Encrypt()
 }
