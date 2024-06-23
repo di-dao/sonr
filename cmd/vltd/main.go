@@ -1,24 +1,26 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-
-	"github.com/urfave/cli/v2"
+	"github.com/di-dao/sonr/pkg/vault"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	app := &cli.App{
-		Name:  "vltd",
-		Usage: "run the vault rest api and htmx frontend",
-		Action: func(*cli.Context) error {
-			fmt.Println("boom! I say!")
-			return nil
+func serveCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:                        "vltd",
+		Aliases:                    []string{"vault"},
+		Short:                      "run the vault rest api and htmx frontend",
+		DisableFlagParsing:         false,
+		SuggestionsMinimumDistance: 2,
+		Run: func(cmd *cobra.Command, args []string) {
+			vault.Serve(cmd.Context())
+			select {}
 		},
 	}
+}
 
-	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+func main() {
+	if err := serveCmd().Execute(); err != nil {
+		panic(err)
 	}
 }
