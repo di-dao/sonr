@@ -2,13 +2,15 @@ package models
 
 import (
 	"encoding/json"
+
+	"github.com/di-dao/sonr/crypto"
 )
 
 // Metadata represents metadata of a resource
 type Metadata struct {
-	Creds      Credentials `json:"credentials"`
-	Properties Properties  `json:"properties"`
-	Address    string      `json:"address"`
+	Creds     Credentials      `json:"credentials"`
+	Address   string           `json:"address"`
+	PublicKey crypto.PublicKey `json:"publicKey"`
 }
 
 func (i *Metadata) Marshal() ([]byte, error) {

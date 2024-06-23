@@ -15,6 +15,6 @@ func SeedTables() (*VaultDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.AutoMigrate(&models.Account{}, &models.Credential{}, &models.Profile{}, &models.Property{})
+	db.AutoMigrate(&models.Wallet{}, &models.Credential{}, &models.Profile{})
 	return &VaultDB{DB: db}, nil
 }
