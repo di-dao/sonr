@@ -14,7 +14,7 @@ import (
 func Serve(ctx context.Context) {
 	e := echo.New()
 	routes.RegisterPages(e)
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
 	// Start server
 	go func() {
@@ -27,6 +27,7 @@ func Serve(ctx context.Context) {
 	<-ctx.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}

@@ -9,7 +9,13 @@ import (
 )
 
 // VFD is an interface for interacting with a virtual file drive.
-type VFD interface{}
+type VFD interface {
+	// Lock()
+	// Unlock()
+	// Metadata()
+	// KSS()
+	// DB()
+}
 
 // vfd is the struct implementation of an IPFS file system
 type vfd struct {

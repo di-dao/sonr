@@ -5,7 +5,8 @@
     "golangci-lint@latest",
     "go-task@latest",
     "go_1_21@latest",
-    "templ@latest"
+    "templ@latest",
+    "air@latest"
   ],
   "env": {
     "GOPATH": "$HOME/go",
