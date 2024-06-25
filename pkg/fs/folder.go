@@ -22,6 +22,7 @@ func NewFolder(path string) (Folder, error) {
 	return folder, nil
 }
 
+// Path returns the path of the folder
 func (f Folder) Path() string {
 	return string(f)
 }
