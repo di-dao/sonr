@@ -10,74 +10,103 @@ import (
 	"github.com/ipfs/boxo/files"
 )
 
-type Folder string
+type Folder struct {
+	path string
+	name string
+}
 
 // NewFolder creates a new Folder instance and creates the folder on disk
-func NewFolder(path string) (Folder, error) {
-	folder := Folder(path)
+func NewFolder(path string) (*Folder, error) {
+	folder := &Folder{
+		path: path,
+		name: filepath.Base(path),
+	}
 	err := folder.Create()
 	if err != nil {
-		return "", fmt.Errorf("failed to create folder: %w", err)
+		return nil, fmt.Errorf("failed to create folder: %w", err)
 	}
 	return folder, nil
 }
 
 // Path returns the path of the folder
-func (f Folder) Path() string {
-	return string(f)
+func (f *Folder) Path() string {
+	return f.path
+}
+
+// Name returns the name of the folder
+func (f *Folder) Name() string {
+	return f.name
+}
+
+// SetPath sets the path of the folder
+func (f *Folder) SetPath(path string) {
+	f.path = path
+	f.name = filepath.Base(path)
+}
+
+// Validate checks if the folder is valid
+func (f *Folder) Validate() error {
+	if !f.Exists() {
+		return fmt.Errorf("folder does not exist: %s", f.path)
+	}
+	return nil
 }
 
 // Create creates the folder if it doesn't exist
-func (f Folder) Create() error {
-	return os.MkdirAll(f.Path(), os.ModePerm)
+func (f *Folder) Create() error {
+	return os.MkdirAll(f.path, os.ModePerm)
 }
 
 // Exists checks if the folder exists
-func (f Folder) Exists() bool {
-	_, err := os.Stat(f.Path())
+func (f *Folder) Exists() bool {
+	_, err := os.Stat(f.path)
 	return !os.IsNotExist(err)
 }
 
 // AddFile adds a file to the directory with the given name and data
-func (f Folder) AddFile(name string, data []byte) error {
+func (f *Folder) AddFile(name string, data []byte) error {
 	if !f.Exists() {
 		if err := f.Create(); err != nil {
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
 	}
 
-	filePath := filepath.Join(f.Path(), name)
+	filePath := filepath.Join(f.path, name)
 	return os.WriteFile(filePath, data, 0644)
 }
 
 // Remove removes the folder and its contents
-func (f Folder) Remove() error {
-	return os.RemoveAll(f.Path())
+func (f *Folder) Remove() error {
+	return os.RemoveAll(f.path)
 }
 
 // ReadDir reads the contents of the folder
-func (f Folder) ReadDir() ([]fs.DirEntry, error) {
-	return os.ReadDir(f.Path())
+func (f *Folder) ReadDir() ([]fs.DirEntry, error) {
+	return os.ReadDir(f.path)
 }
 
 // Join joins the folder path with the given elements
-func (f Folder) Join(elem ...string) Folder {
-	return Folder(filepath.Join(append([]string{f.Path()}, elem...)...))
+func (f *Folder) Join(elem ...string) *Folder {
+	newPath := filepath.Join(append([]string{f.path}, elem...)...)
+	return &Folder{
+		path: newPath,
+		name: filepath.Base(newPath),
+	}
 }
 
 // IsDir checks if the folder is a directory
-func (f Folder) IsDir() bool {
-	info, err := os.Stat(f.Path())
+func (f *Folder) IsDir() bool {
+	info, err := os.Stat(f.path)
 	return err == nil && info.IsDir()
 }
 
 // Node returns the folder as an IPFS node
-func (f Folder) Node() (files.Node, error) {
-	return f.loadDirectory(f.Path())
+func (f *Folder) Node() (files.Node, error) {
+	return f.loadDirectory(f.path)
 }
 
 // loadDirectory recursively loads the files and directories from a given path
-func (f Folder) loadDirectory(path string) (files.Node, error) {
+func (f *Folder) loadDirectory(path string) (files.Node, error) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
@@ -112,24 +141,27 @@ func (f Folder) loadDirectory(path string) (files.Node, error) {
 	return files.NewMapDirectory(dirMap), nil
 }
 
-// Load creates a new Folder from a given files.Node
-func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
-	folder := Folder(path)
+// LoadNodeInFolder creates a new Folder from a given files.Node
+func LoadNodeInFolder(path string, node files.Node) (*Folder, error) {
+	folder := &Folder{
+		path: path,
+		name: filepath.Base(path),
+	}
 	err := folder.Create()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	err = folder.loadFromNode(node, path)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return folder, nil
 }
 
 // loadFromNode recursively loads files and directories from a given files.Node
-func (f Folder) loadFromNode(node files.Node, path string) error {
+func (f *Folder) loadFromNode(node files.Node, path string) error {
 	switch n := node.(type) {
 	case files.File:
 		data, err := io.ReadAll(n)
