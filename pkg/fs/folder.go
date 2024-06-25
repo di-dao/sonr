@@ -4,34 +4,12 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-
-	"github.com/ipfs/boxo/files"
 )
 
 type Folder string
 
 func (f Folder) Path() string {
 	return string(f)
-}
-
-func (f Folder) Node() files.Node {
-	entries, err := f.ReadDir()
-	if err != nil {
-		return nil
-	}
-
-	fileList := make([]files.DirEntry, 0, len(entries))
-	for _, entry := range entries {
-		name := entry.Name()
-		path := filepath.Join(f.Path(), name)
-		if entry.IsDir() {
-			fileList = append(fileList, files.FileEntry(name, files.NewSerialFile(name, path, false)))
-		} else {
-			fileList = append(fileList, files.FileEntry(name, files.NewSerialFile(name, path, true)))
-		}
-	}
-
-	return files.NewSliceDirectory(fileList)
 }
 
 // Create creates the folder if it doesn't exist
