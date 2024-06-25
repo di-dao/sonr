@@ -12,6 +12,16 @@ import (
 
 type Folder string
 
+// NewFolder creates a new Folder instance and creates the folder on disk
+func NewFolder(path string) (Folder, error) {
+	folder := Folder(path)
+	err := folder.Create()
+	if err != nil {
+		return "", fmt.Errorf("failed to create folder: %w", err)
+	}
+	return folder, nil
+}
+
 func (f Folder) Path() string {
 	return string(f)
 }
