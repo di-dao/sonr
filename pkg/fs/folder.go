@@ -90,7 +90,7 @@ func (f Folder) loadDirectory(path string) (files.Node, error) {
 }
 
 // Load creates a new Folder from a given files.Node
-func Load(path string, node files.Node) (Folder, error) {
+func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
 	folder := Folder(path)
 	err := folder.Create()
 	if err != nil {
