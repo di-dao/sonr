@@ -4,12 +4,17 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/ipfs/boxo/files"
 )
 
 type Folder string
 
 func (f Folder) Path() string {
 	return string(f)
+}
+
+func (f Folder) Node() files.Node {
 }
 
 // Create creates the folder if it doesn't exist
