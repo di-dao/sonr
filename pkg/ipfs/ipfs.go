@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/di-dao/sonr/internal/local"
+	"github.com/di-dao/sonr/pkg/fs"
 	"github.com/ipfs/boxo/path"
 	"github.com/ipfs/kubo/client/rpc"
 	coreiface "github.com/ipfs/kubo/core/coreiface"
@@ -31,8 +32,8 @@ func NewKey(ctx context.Context, addr string) (IPNSKey, error) {
 	return key, nil
 }
 
-// GetFileSystem returns the VFS interface from the client UnixFS API.
-func GetFileSystem(ctx context.Context, path string) (VFS, error) {
+// GetFileSystem returns the Folder interface from the client UnixFS API.
+func GetFileSystem(ctx context.Context, path string) (*fs.Folder, error) {
 	c, err := local.GetIPFSClient()
 	if err != nil {
 		return nil, err
@@ -47,38 +48,42 @@ func GetFileSystem(ctx context.Context, path string) (VFS, error) {
 	if err != nil {
 		return nil, err
 	}
-	return Load(path, node)
+	return fs.NewFolder(path, node)
 }
 
-// SaveFileSystem saves the VFS interface to the client UnixFS API.
-func SaveFileSystem(ctx context.Context, fs VFS) error {
+// SaveFileSystem saves the Folder interface to the client UnixFS API.
+func SaveFileSystem(ctx context.Context, folder *fs.Folder) error {
 	// Call the IPFS client to get the UnixFS API.
 	c, err := local.GetIPFSClient()
 	if err != nil {
 		return err
 	}
-	api, err := c.Unixfs().Add(ctx, fs.Node())
+	node, err := folder.Node()
 	if err != nil {
 		return err
 	}
-	fs.setPath(api)
+	api, err := c.Unixfs().Add(ctx, node)
+	if err != nil {
+		return err
+	}
+	folder.SetPath(api.String())
 	return nil
 }
 
-// PublishFileSystem publishes the VFS interface to the client UnixFS API.
-func PublishFileSystem(ctx context.Context, fs VFS) error {
+// PublishFileSystem publishes the Folder interface to the client UnixFS API.
+func PublishFileSystem(ctx context.Context, folder *fs.Folder) error {
 	// Call the IPFS client to get the UnixFS API.
 	c, err := local.GetIPFSClient()
 	if err != nil {
 		return err
 	}
 
-	err = fs.Validate()
+	err = folder.Validate()
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Name().Publish(ctx, fs.Path(), options.Name.Key(fs.Name()))
+	_, err = c.Name().Publish(ctx, path.New(folder.Path()), options.Name.Key(folder.Name()))
 	if err != nil {
 		return err
 	}
