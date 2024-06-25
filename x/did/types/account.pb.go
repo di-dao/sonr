@@ -4,13 +4,14 @@
 package types
 
 import (
+	types "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	fmt "fmt"
 	io "io"
 	math "math"
 	math_bits "math/bits"
 
 	_ "github.com/cosmos/cosmos-proto"
-	types "github.com/cosmos/cosmos-sdk/x/auth/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
 )

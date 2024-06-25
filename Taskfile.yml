@@ -1,6 +1,15 @@
 version: "3"
 
 tasks:
+  dev:
+    cmd: air
+
+  install:
+    cmd: make install
+
+  testnet:
+    cmd: make sh-testnet
+
   proto:
     cmd: devbox -q run proto
 
