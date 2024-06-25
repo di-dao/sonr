@@ -8,20 +8,25 @@ import (
 	"path/filepath"
 
 	"github.com/ipfs/boxo/files"
+	"github.com/ipfs/boxo/path"
 )
 
 type Folder struct {
-	path string
+	path path.Path
 	name string
 }
 
 // NewFolder creates a new Folder instance and creates the folder on disk
-func NewFolder(path string) (*Folder, error) {
-	folder := &Folder{
-		path: path,
-		name: filepath.Base(path),
+func NewFolder(p string) (*Folder, error) {
+	folderPath, err := path.NewPath(p)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create path: %w", err)
 	}
-	err := folder.Create()
+	folder := &Folder{
+		path: folderPath,
+		name: filepath.Base(p),
+	}
+	err = folder.Create()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create folder: %w", err)
 	}
@@ -29,7 +34,7 @@ func NewFolder(path string) (*Folder, error) {
 }
 
 // Path returns the path of the folder
-func (f *Folder) Path() string {
+func (f *Folder) Path() path.Path {
 	return f.path
 }
 
@@ -39,27 +44,32 @@ func (f *Folder) Name() string {
 }
 
 // SetPath sets the path of the folder
-func (f *Folder) SetPath(path string) {
-	f.path = path
-	f.name = filepath.Base(path)
+func (f *Folder) SetPath(p string) error {
+	newPath, err := path.NewPath(p)
+	if err != nil {
+		return fmt.Errorf("failed to set path: %w", err)
+	}
+	f.path = newPath
+	f.name = filepath.Base(p)
+	return nil
 }
 
 // Validate checks if the folder is valid
 func (f *Folder) Validate() error {
 	if !f.Exists() {
-		return fmt.Errorf("folder does not exist: %s", f.path)
+		return fmt.Errorf("folder does not exist: %s", f.path.String())
 	}
 	return nil
 }
 
 // Create creates the folder if it doesn't exist
 func (f *Folder) Create() error {
-	return os.MkdirAll(f.path, os.ModePerm)
+	return os.MkdirAll(f.path.String(), os.ModePerm)
 }
 
 // Exists checks if the folder exists
 func (f *Folder) Exists() bool {
-	_, err := os.Stat(f.path)
+	_, err := os.Stat(f.path.String())
 	return !os.IsNotExist(err)
 }
 
@@ -71,38 +81,42 @@ func (f *Folder) AddFile(name string, data []byte) error {
 		}
 	}
 
-	filePath := filepath.Join(f.path, name)
+	filePath := filepath.Join(f.path.String(), name)
 	return os.WriteFile(filePath, data, 0644)
 }
 
 // Remove removes the folder and its contents
 func (f *Folder) Remove() error {
-	return os.RemoveAll(f.path)
+	return os.RemoveAll(f.path.String())
 }
 
 // ReadDir reads the contents of the folder
 func (f *Folder) ReadDir() ([]fs.DirEntry, error) {
-	return os.ReadDir(f.path)
+	return os.ReadDir(f.path.String())
 }
 
 // Join joins the folder path with the given elements
-func (f *Folder) Join(elem ...string) *Folder {
-	newPath := filepath.Join(append([]string{f.path}, elem...)...)
+func (f *Folder) Join(elem ...string) (*Folder, error) {
+	newPathStr := filepath.Join(append([]string{f.path.String()}, elem...)...)
+	newPath, err := path.NewPath(newPathStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new path: %w", err)
+	}
 	return &Folder{
 		path: newPath,
-		name: filepath.Base(newPath),
-	}
+		name: filepath.Base(newPathStr),
+	}, nil
 }
 
 // IsDir checks if the folder is a directory
 func (f *Folder) IsDir() bool {
-	info, err := os.Stat(f.path)
+	info, err := os.Stat(f.path.String())
 	return err == nil && info.IsDir()
 }
 
 // Node returns the folder as an IPFS node
 func (f *Folder) Node() (files.Node, error) {
-	return f.loadDirectory(f.path)
+	return f.loadDirectory(f.path.String())
 }
 
 // loadDirectory recursively loads the files and directories from a given path
@@ -142,17 +156,21 @@ func (f *Folder) loadDirectory(path string) (files.Node, error) {
 }
 
 // LoadNodeInFolder creates a new Folder from a given files.Node
-func LoadNodeInFolder(path string, node files.Node) (*Folder, error) {
-	folder := &Folder{
-		path: path,
-		name: filepath.Base(path),
+func LoadNodeInFolder(p string, node files.Node) (*Folder, error) {
+	folderPath, err := path.NewPath(p)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create path: %w", err)
 	}
-	err := folder.Create()
+	folder := &Folder{
+		path: folderPath,
+		name: filepath.Base(p),
+	}
+	err = folder.Create()
 	if err != nil {
 		return nil, err
 	}
 
-	err = folder.loadFromNode(node, path)
+	err = folder.loadFromNode(node, p)
 	if err != nil {
 		return nil, err
 	}
