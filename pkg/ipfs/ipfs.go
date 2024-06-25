@@ -2,6 +2,7 @@ package ipfs
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/di-dao/sonr/internal/local"
 	"github.com/di-dao/sonr/pkg/fs"
@@ -48,7 +49,7 @@ func GetFileSystem(ctx context.Context, path string) (*fs.Folder, error) {
 	if err != nil {
 		return nil, err
 	}
-	return fs.NewFolder(path, node)
+	return fs.LoadNodeInFolder(path, node)
 }
 
 // SaveFileSystem saves the Folder interface to the client UnixFS API.
@@ -62,11 +63,10 @@ func SaveFileSystem(ctx context.Context, folder *fs.Folder) error {
 	if err != nil {
 		return err
 	}
-	api, err := c.Unixfs().Add(ctx, node)
+	_, err = c.Unixfs().Add(ctx, node)
 	if err != nil {
 		return err
 	}
-	folder.SetPath(api.String())
 	return nil
 }
 
@@ -78,12 +78,7 @@ func PublishFileSystem(ctx context.Context, folder *fs.Folder) error {
 		return err
 	}
 
-	err = folder.Validate()
-	if err != nil {
-		return err
-	}
-
-	_, err = c.Name().Publish(ctx, path.New(folder.Path()), options.Name.Key(folder.Name()))
+	_, err = c.Name().Publish(ctx, folder.Path(), options.Name.Key(filepath.Base(folder.Name())))
 	if err != nil {
 		return err
 	}
