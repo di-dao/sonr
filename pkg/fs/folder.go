@@ -27,6 +27,18 @@ func (f Folder) Exists() bool {
 	return !os.IsNotExist(err)
 }
 
+// AddFile adds a file to the directory with the given name and data
+func (f Folder) AddFile(name string, data []byte) error {
+	if !f.Exists() {
+		if err := f.Create(); err != nil {
+			return fmt.Errorf("failed to create directory: %w", err)
+		}
+	}
+
+	filePath := filepath.Join(f.Path(), name)
+	return os.WriteFile(filePath, data, 0644)
+}
+
 // Remove removes the folder and its contents
 func (f Folder) Remove() error {
 	return os.RemoveAll(f.Path())
