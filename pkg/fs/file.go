@@ -1,7 +1,6 @@
 package fs
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 )
@@ -17,6 +16,11 @@ func NewFile(path string) File {
 // Name returns the name of the file
 func (f File) Name() string {
 	return filepath.Base(string(f))
+}
+
+// Path returns the path of the file
+func (f File) Path() string {
+	return string(f)
 }
 
 // Read reads the contents of the file
