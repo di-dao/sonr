@@ -2,6 +2,7 @@ package fs
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -220,4 +221,45 @@ func LoadFromIPFS(ctx context.Context, path string) (Folder, error) {
 
 // LoadNodeInFolder loads an IPFS node into a Folder
 func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
+	folder := NewFolder(path)
+	if err := folder.Create(); err != nil {
+		return "", err
+	}
+
+	switch n := node.(type) {
+	case *files.Symlink:
+		target, err := n.Target()
+		if err != nil {
+			return "", err
+		}
+		if err := os.Symlink(target, folder.Path()); err != nil {
+			return "", err
+		}
+	case files.File:
+		f, err := os.Create(folder.Path())
+		if err != nil {
+			return "", err
+		}
+		defer f.Close()
+		if _, err := io.Copy(f, n); err != nil {
+			return "", err
+		}
+	case files.Directory:
+		entries := n.Entries()
+		for entries.Next() {
+			name := entries.Name()
+			childNode := entries.Node()
+			childPath := filepath.Join(folder.Path(), name)
+			if _, err := LoadNodeInFolder(childPath, childNode); err != nil {
+				return "", err
+			}
+		}
+		if entries.Err() != nil {
+			return "", entries.Err()
+		}
+	default:
+		return "", fmt.Errorf("unsupported node type: %T", n)
+	}
+
+	return folder, nil
 }
