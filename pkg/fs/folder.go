@@ -5,11 +5,33 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"time"
 )
+
+// Constant for the name of the folder where the vaults are stored
+const kVaultsFolderName = ".sonr-vaults"
+
+// VaultsFolder is the folder where the vaults are stored
+var VaultsFolder Folder
 
 // Folder represents a folder in the filesystem
 type Folder string
+
+// Package initializes the VaultsFolder
+func init() {
+	// Initialize VaultsFolder
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the folder if it does not exist
+	VaultsFolder = NewFolder(filepath.Join(homeDir, kVaultsFolderName))
+	if !VaultsFolder.Exists() {
+		if err := VaultsFolder.Create(); err != nil {
+			panic(err)
+		}
+	}
+}
 
 // NewFolder creates a new Folder instance
 func NewFolder(path string) Folder {
@@ -105,16 +127,19 @@ func (f Folder) IsDir() bool {
 }
 
 // Touch creates an empty file if it doesn't exist, or updates its access and modification times if it does
-func (f Folder) Touch(name string) error {
+func (f Folder) Touch(name string) (File, error) {
+	var err error
 	filePath := filepath.Join(string(f), name)
-	_, err := os.Stat(filePath)
+	_, err = os.Stat(filePath)
 	if os.IsNotExist(err) {
 		file, err := os.Create(filePath)
 		if err != nil {
-			return err
+			return File(filePath), err
 		}
-		return file.Close()
+		if err := file.Close(); err != nil {
+			return File(filePath), err
+		}
+		return File(filePath), nil
 	}
-	currentTime := time.Now().Local()
-	return os.Chtimes(filePath, currentTime, currentTime)
+	return File(filePath), err
 }
