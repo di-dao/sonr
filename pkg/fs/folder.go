@@ -1,12 +1,15 @@
 package fs
 
 import (
+	"context"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/ipfs/boxo/files"
+	"github.com/ipfs/boxo/path"
+	"github.com/ipfs/kubo/core/coreiface/options"
 )
 
 // Constant for the name of the folder where the vaults are stored
@@ -173,4 +176,63 @@ func (f Folder) Node() (files.Node, error) {
 	}
 
 	return files.NewSliceDirectory(dirEntries), nil
+}
+
+// SaveToIPFS saves the Folder to IPFS and returns the IPFS path
+func (f Folder) SaveToIPFS(ctx context.Context) (path.Path, error) {
+	node, err := f.Node()
+	if err != nil {
+		return nil, err
+	}
+	c, err := getIPFSClient()
+	if err != nil {
+		return nil, err
+	}
+	return c.Unixfs().Add(ctx, node)
+}
+
+// PublishToIPNS publishes the Folder to IPNS
+func (f Folder) PublishToIPNS(ctx context.Context, ipfsPath path.Path) error {
+	c, err := getIPFSClient()
+	if err != nil {
+		return err
+	}
+	_, err = c.Name().Publish(ctx, ipfsPath, options.Name.Key(filepath.Base(f.Name())))
+	return err
+}
+
+// LoadFromIPFS loads a Folder from IPFS
+func LoadFromIPFS(ctx context.Context, path string) (*Folder, error) {
+	c, err := getIPFSClient()
+	if err != nil {
+		return nil, err
+	}
+	cid, err := parsePath(path)
+	if err != nil {
+		return nil, err
+	}
+	node, err := c.Unixfs().Get(ctx, cid)
+	if err != nil {
+		return nil, err
+	}
+	return LoadNodeInFolder(path, node)
+}
+
+// Helper function to parse IPFS path
+func parsePath(p string) (path.Path, error) {
+	return path.NewPath(p)
+}
+
+// Helper function to get IPFS client
+func getIPFSClient() (*rpc.HttpApi, error) {
+	// Implement this function to return your IPFS client
+	// You may need to adjust the import and the actual client creation based on your setup
+	return nil, nil
+}
+
+// LoadNodeInFolder loads an IPFS node into a Folder
+func LoadNodeInFolder(path string, node files.Node) (*Folder, error) {
+	// Implement this function to convert an IPFS node to a Folder
+	// You may need to recursively traverse the node and create the corresponding file structure
+	return nil, nil
 }

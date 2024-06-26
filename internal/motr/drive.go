@@ -1,21 +1,21 @@
 package motr
 
 import (
+	"context"
+
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/di-dao/sonr/crypto/kss"
 	"github.com/di-dao/sonr/crypto/mpc"
 	"github.com/di-dao/sonr/pkg/fs"
+	"github.com/ipfs/kubo/core/coreiface"
 )
 
 const kSonrHRP = "idx"
 
 // VFD is an interface for interacting with a virtual file drive.
 type VFD interface {
-	// Lock()
-	// Unlock()
-	// Metadata()
-	// KSS()
-	// DB()
+	Name() string
+	GenerateKey(ctx context.Context) (coreiface.Key, error)
 }
 
 // vfd is the struct implementation of an IPFS file system
@@ -43,9 +43,22 @@ func New() (VFD, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return &drive{
+		folder: rootDir,
+		addr:   addr,
+		kss:    kss,
+	}, nil
 }
 
 // Name returns the name of the virtual file system.
-func (v *vfd) Name() string {
+func (v *drive) Name() string {
 	return v.folder.Name()
+}
+
+// GenerateKey creates a new IPFS key.
+func (v *drive) GenerateKey(ctx context.Context) (coreiface.Key, error) {
+	// Implement the key generation logic here
+	// You may need to use the IPFS client to generate the key
+	return nil, nil
 }
