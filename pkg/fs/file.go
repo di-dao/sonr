@@ -3,51 +3,61 @@ package fs
 import (
 	"io"
 	"os"
-	"time"
+	"path/filepath"
 )
 
 // File represents a file in the filesystem
-type File struct {
-	name string
-	data []byte
-}
+type File string
 
 // NewFile creates a new File instance
-func NewFile(name string, data []byte) *File {
-	return &File{
-		name: name,
-		data: data,
-	}
+func NewFile(path string) File {
+	return File(path)
 }
 
 // Name returns the name of the file
-func (f *File) Name() string {
-	return f.name
+func (f File) Name() string {
+	return filepath.Base(string(f))
 }
 
-// Read implements io.Reader
-func (f *File) Read(p []byte) (n int, err error) {
-	return copy(p, f.data), io.EOF
+// Read reads the contents of the file
+func (f File) Read() ([]byte, error) {
+	return os.ReadFile(string(f))
 }
 
-// Close implements io.Closer
-func (f *File) Close() error {
-	return nil
+// Write writes data to the file
+func (f File) Write(data []byte) error {
+	return os.WriteFile(string(f), data, 0644)
 }
 
-// Stat implements os.FileInfo
-func (f *File) Stat() (os.FileInfo, error) {
-	return &fileInfo{f}, nil
+// Append appends data to the file
+func (f File) Append(data []byte) error {
+	file, err := os.OpenFile(string(f), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(data)
+	return err
 }
 
-// fileInfo implements os.FileInfo
-type fileInfo struct {
-	file *File
+// Exists checks if the file exists
+func (f File) Exists() bool {
+	_, err := os.Stat(string(f))
+	return !os.IsNotExist(err)
 }
 
-func (fi *fileInfo) Name() string       { return fi.file.name }
-func (fi *fileInfo) Size() int64        { return int64(len(fi.file.data)) }
-func (fi *fileInfo) Mode() os.FileMode  { return 0644 }
-func (fi *fileInfo) ModTime() time.Time { return time.Now() }
-func (fi *fileInfo) IsDir() bool        { return false }
-func (fi *fileInfo) Sys() interface{}   { return nil }
+// Remove removes the file
+func (f File) Remove() error {
+	return os.Remove(string(f))
+}
+
+// Stat returns the FileInfo for the file
+func (f File) Stat() (os.FileInfo, error) {
+	return os.Stat(string(f))
+}
+
+// Open opens the file and returns an *os.File
+func (f File) Open() (*os.File, error) {
+	return os.Open(string(f))
+}
