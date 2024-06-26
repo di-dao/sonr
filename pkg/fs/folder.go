@@ -2,13 +2,16 @@ package fs
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 
+	"github.com/di-dao/sonr/internal/local"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
+	"github.com/ipfs/kubo/client/rpc"
 	"github.com/ipfs/kubo/core/coreiface/options"
 )
 
@@ -202,18 +205,18 @@ func (f Folder) PublishToIPNS(ctx context.Context, ipfsPath path.Path) error {
 }
 
 // LoadFromIPFS loads a Folder from IPFS
-func LoadFromIPFS(ctx context.Context, path string) (*Folder, error) {
+func LoadFromIPFS(ctx context.Context, path string) (Folder, error) {
 	c, err := getIPFSClient()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	cid, err := parsePath(path)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	node, err := c.Unixfs().Get(ctx, cid)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	return LoadNodeInFolder(path, node)
 }
@@ -225,14 +228,30 @@ func parsePath(p string) (path.Path, error) {
 
 // Helper function to get IPFS client
 func getIPFSClient() (*rpc.HttpApi, error) {
-	// Implement this function to return your IPFS client
-	// You may need to adjust the import and the actual client creation based on your setup
-	return nil, nil
+	return local.GetIPFSClient()
 }
 
 // LoadNodeInFolder loads an IPFS node into a Folder
-func LoadNodeInFolder(path string, node files.Node) (*Folder, error) {
-	// Implement this function to convert an IPFS node to a Folder
-	// You may need to recursively traverse the node and create the corresponding file structure
-	return nil, nil
+func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
+	it := dir.Entries()
+	for it.Next() {
+		name, node := it.Name(), it.Node()
+		switch node := node.(type) {
+		case files.File:
+			_, err := io.ReadAll(node)
+			if err != nil {
+				return err
+			}
+
+		case files.Directory:
+			subDir := files.DirFromEntry(files.FileEntry(name, node))
+			err := loadDirectory(subDir, vfs)
+			if err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("unsupported node type")
+		}
+	}
+	return nil
 }
