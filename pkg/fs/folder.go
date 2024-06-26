@@ -15,6 +15,16 @@ func NewFolder(path string) Folder {
 	return Folder(path)
 }
 
+// NewVaultFolder creates a new folder under the VaultsFolder directory
+func NewVaultFolder(name string) (Folder, error) {
+	vaultFolder := VaultsFolder.Join(name)
+	err := vaultFolder.Create()
+	if err != nil {
+		return "", err
+	}
+	return vaultFolder, nil
+}
+
 // Name returns the name of the folder
 func (f Folder) Name() string {
 	return filepath.Base(string(f))
@@ -91,14 +101,4 @@ func (f Folder) Join(elem ...string) Folder {
 func (f Folder) IsDir() bool {
 	info, err := os.Stat(string(f))
 	return err == nil && info.IsDir()
-}
-
-// NewVaultFolder creates a new folder under the VaultsFolder directory
-func NewVaultFolder(name string) (Folder, error) {
-	vaultFolder := VaultsFolder.Join(name)
-	err := vaultFolder.Create()
-	if err != nil {
-		return "", err
-	}
-	return vaultFolder, nil
 }
