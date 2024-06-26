@@ -5,6 +5,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/ipfs/boxo/files"
 )
 
 // Constant for the name of the folder where the vaults are stored
