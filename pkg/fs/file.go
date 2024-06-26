@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -61,7 +62,7 @@ func (f File) Stat() (os.FileInfo, error) {
 	return os.Stat(string(f))
 }
 
-// Open opens the file and returns an *os.File
-func (f File) Open() (*os.File, error) {
+// Open opens the file and returns an fs.File
+func (f File) Open() (fs.File, error) {
 	return os.Open(string(f))
 }
