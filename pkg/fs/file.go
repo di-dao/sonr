@@ -4,6 +4,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/ipfs/boxo/files"
 )
 
 // File represents a file in the filesystem
@@ -65,4 +67,13 @@ func (f File) Stat() (os.FileInfo, error) {
 // Open opens the file and returns an fs.File
 func (f File) Open() (fs.File, error) {
 	return os.Open(string(f))
+}
+
+// Node returns a files.Node representation of the file
+func (f File) Node() (files.Node, error) {
+	file, err := os.Open(string(f))
+	if err != nil {
+		return nil, err
+	}
+	return files.NewReaderFile(file), nil
 }

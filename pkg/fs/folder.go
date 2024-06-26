@@ -156,7 +156,6 @@ func (f Folder) Node() (files.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	dirEntries := make([]files.DirEntry, 0, len(entries))
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -175,7 +174,6 @@ func (f Folder) Node() (files.Node, error) {
 			dirEntries = append(dirEntries, files.FileEntry(entry.Name(), fileNode))
 		}
 	}
-
 	return files.NewSliceDirectory(dirEntries), nil
 }
 
@@ -198,7 +196,7 @@ func (f Folder) PublishToIPNS(ctx context.Context, ipfsPath path.Path) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.Name().Publish(ctx, ipfsPath, options.Name.Key(filepath.Base(f.Name())))
+	_, err = c.Name().Publish(ctx, ipfsPath, options.Name.Key(f.Name()))
 	return err
 }
 
@@ -227,14 +225,6 @@ func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
 	}
 
 	switch n := node.(type) {
-	case *files.Symlink:
-		target, err := n.Target()
-		if err != nil {
-			return "", err
-		}
-		if err := os.Symlink(target, folder.Path()); err != nil {
-			return "", err
-		}
 	case files.File:
 		f, err := os.Create(folder.Path())
 		if err != nil {
