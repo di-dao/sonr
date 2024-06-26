@@ -22,5 +22,5 @@ func init() {
 }
 
 func FetchVaultPath(name string) string {
-	return filepath.Join(VaultsFolder.Path(), name)
+	return VaultsFolder.Join(name).Path()
 }
