@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // Folder represents a folder in the filesystem
@@ -101,4 +102,19 @@ func (f Folder) Join(elem ...string) Folder {
 func (f Folder) IsDir() bool {
 	info, err := os.Stat(string(f))
 	return err == nil && info.IsDir()
+}
+
+// Touch creates an empty file if it doesn't exist, or updates its access and modification times if it does
+func (f Folder) Touch(name string) error {
+	filePath := filepath.Join(string(f), name)
+	_, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		file, err := os.Create(filePath)
+		if err != nil {
+			return err
+		}
+		return file.Close()
+	}
+	currentTime := time.Now().Local()
+	return os.Chtimes(filePath, currentTime, currentTime)
 }
