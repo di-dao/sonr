@@ -2,28 +2,15 @@ package fs
 
 import (
 	"context"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
-	"encoding/json"
-	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 
-	"github.com/di-dao/sonr/internal/local"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
-	"github.com/ipfs/kubo/client/rpc"
 	"github.com/ipfs/kubo/core/coreiface/options"
 )
-
-// EncryptionMetadata stores encryption-related information
-type EncryptionMetadata struct {
-	Algorithm string `json:"algorithm"`
-	IV        []byte `json:"iv"`
-}
 
 // Constant for the name of the folder where the vaults are stored
 const kVaultsFolderName = ".sonr-vaults"
@@ -220,7 +207,7 @@ func LoadFromIPFS(ctx context.Context, path string) (Folder, error) {
 	if err != nil {
 		return "", err
 	}
-	cid, err := parsePath(path)
+	cid, err := ParsePath(path)
 	if err != nil {
 		return "", err
 	}
@@ -231,135 +218,6 @@ func LoadFromIPFS(ctx context.Context, path string) (Folder, error) {
 	return LoadNodeInFolder(path, node)
 }
 
-// Helper function to parse IPFS path
-func parsePath(p string) (path.Path, error) {
-	return path.NewPath(p)
-}
-
-// Helper function to get IPFS client
-func getIPFSClient() (*rpc.HttpApi, error) {
-	return local.GetIPFSClient()
-}
-
 // LoadNodeInFolder loads an IPFS node into a Folder
 func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
-	it := dir.Entries()
-	for it.Next() {
-		name, node := it.Name(), it.Node()
-		switch node := node.(type) {
-		case files.File:
-			_, err := io.ReadAll(node)
-			if err != nil {
-				return err
-			}
-
-		case files.Directory:
-			subDir := files.DirFromEntry(files.FileEntry(name, node))
-			err := loadDirectory(subDir, vfs)
-			if err != nil {
-				return err
-			}
-		default:
-			return fmt.Errorf("unsupported node type")
-		}
-	}
-	return nil
-}
-
-// Encrypt encrypts the provided data using AES-GCM
-func (f Folder) Encrypt(data []byte, key []byte) ([]byte, EncryptionMetadata, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, EncryptionMetadata{}, err
-	}
-
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return nil, EncryptionMetadata{}, err
-	}
-
-	iv := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
-		return nil, EncryptionMetadata{}, err
-	}
-
-	ciphertext := gcm.Seal(nil, iv, data, nil)
-
-	metadata := EncryptionMetadata{
-		Algorithm: "AES-GCM",
-		IV:        iv,
-	}
-
-	return ciphertext, metadata, nil
-}
-
-// Decrypt decrypts the provided data using AES-GCM
-func (f Folder) Decrypt(data []byte, key []byte, metadata EncryptionMetadata) ([]byte, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, err
-	}
-
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return nil, err
-	}
-
-	plaintext, err := gcm.Open(nil, metadata.IV, data, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return plaintext, nil
-}
-
-// EncryptFile encrypts a file in the folder
-func (f Folder) EncryptFile(name string, key []byte) error {
-	data, err := f.ReadFile(name)
-	if err != nil {
-		return err
-	}
-
-	encryptedData, metadata, err := f.Encrypt(data, key)
-	if err != nil {
-		return err
-	}
-
-	metadataJSON, err := json.Marshal(metadata)
-	if err != nil {
-		return err
-	}
-
-	err = f.WriteFile(name+".encrypted", encryptedData, 0644)
-	if err != nil {
-		return err
-	}
-
-	return f.WriteFile(name+".metadata", metadataJSON, 0644)
-}
-
-// DecryptFile decrypts a file in the folder
-func (f Folder) DecryptFile(name string, key []byte) error {
-	encryptedData, err := f.ReadFile(name + ".encrypted")
-	if err != nil {
-		return err
-	}
-
-	metadataJSON, err := f.ReadFile(name + ".metadata")
-	if err != nil {
-		return err
-	}
-
-	var metadata EncryptionMetadata
-	err = json.Unmarshal(metadataJSON, &metadata)
-	if err != nil {
-		return err
-	}
-
-	decryptedData, err := f.Decrypt(encryptedData, key, metadata)
-	if err != nil {
-		return err
-	}
-
-	return f.WriteFile(name, decryptedData, 0644)
 }
