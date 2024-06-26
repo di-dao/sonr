@@ -16,8 +16,10 @@ func init() {
 		panic(err)
 	}
 	VaultsFolder = NewFolder(filepath.Join(homeDir, kVaultsFolderName))
-	if err := VaultsFolder.Create(); err != nil {
-		panic(err)
+	if !VaultsFolder.Exists() {
+		if err := VaultsFolder.Create(); err != nil {
+			panic(err)
+		}
 	}
 }
 
