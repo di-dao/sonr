@@ -11,13 +11,16 @@ var VaultsFolder Folder
 
 func init() {
 	// Initialize VaultsFolder
-	f, err := NewFolder(kVaultsFolderName)
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
-	VaultsFolder = f
+	VaultsFolder = NewFolder(filepath.Join(homeDir, kVaultsFolderName))
+	if err := VaultsFolder.Create(); err != nil {
+		panic(err)
+	}
 }
 
 func FetchVaultPath(name string) string {
-	return filepath.Join(os.ExpandEnv("$HOME"), kVaultsFolderName, name)
+	return filepath.Join(VaultsFolder.Path(), name)
 }
