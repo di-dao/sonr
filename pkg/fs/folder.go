@@ -143,3 +143,32 @@ func (f Folder) Touch(name string) (File, error) {
 	}
 	return File(filePath), err
 }
+
+// Node returns a files.Node representation of the folder
+func (f Folder) Node() (files.Node, error) {
+	entries, err := f.Ls()
+	if err != nil {
+		return nil, err
+	}
+
+	dirEntries := make([]files.DirEntry, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() {
+			subFolder := f.Join(entry.Name())
+			subNode, err := subFolder.Node()
+			if err != nil {
+				return nil, err
+			}
+			dirEntries = append(dirEntries, files.FileEntry(entry.Name(), subNode))
+		} else {
+			file := File(filepath.Join(string(f), entry.Name()))
+			fileNode, err := file.Node()
+			if err != nil {
+				return nil, err
+			}
+			dirEntries = append(dirEntries, files.FileEntry(entry.Name(), fileNode))
+		}
+	}
+
+	return files.NewSliceDirectory(dirEntries), nil
+}
