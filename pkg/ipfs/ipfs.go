@@ -53,32 +53,32 @@ func GetFileSystem(ctx context.Context, path string) (*fs.Folder, error) {
 }
 
 // SaveFileSystem saves the Folder interface to the client UnixFS API.
-func SaveFileSystem(ctx context.Context, folder *fs.Folder) error {
+func SaveFileSystem(ctx context.Context, folder fs.Folder) (path.Path, error) {
 	// Call the IPFS client to get the UnixFS API.
 	c, err := local.GetIPFSClient()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	node, err := folder.Node()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, err = c.Unixfs().Add(ctx, node)
+	path, err := c.Unixfs().Add(ctx, node)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return path, nil
 }
 
 // PublishFileSystem publishes the Folder interface to the client UnixFS API.
-func PublishFileSystem(ctx context.Context, folder *fs.Folder) error {
+func PublishFileSystem(ctx context.Context, folder *fs.Folder, ipfsPath path.Path) error {
 	// Call the IPFS client to get the UnixFS API.
 	c, err := local.GetIPFSClient()
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Name().Publish(ctx, folder.Path(), options.Name.Key(filepath.Base(folder.Name())))
+	_, err = c.Name().Publish(ctx, ipfsPath, options.Name.Key(filepath.Base(folder.Name())))
 	if err != nil {
 		return err
 	}
