@@ -80,6 +80,21 @@ func (s *PrimaryKey) UpdateAccumulator(acc *accumulator.Accumulator, addValues, 
 	return acc, nil
 }
 
+// MarshalAccumulator takes a *accumulator.Accumulator and returns a byte slice
+func MarshalAccumulator(acc *accumulator.Accumulator) ([]byte, error) {
+	return acc.MarshalBinary()
+}
+
+// UnmarshalAccumulator takes a byte slice and returns a *accumulator.Accumulator
+func UnmarshalAccumulator(data []byte) (*accumulator.Accumulator, error) {
+	acc := new(accumulator.Accumulator)
+	err := acc.UnmarshalBinary(data)
+	if err != nil {
+		return nil, err
+	}
+	return acc, nil
+}
+
 func convertValuesToElements(values []string) []accumulator.Element {
 	curve := curves.BLS12381(&curves.PointBls12381G1{})
 	elements := []accumulator.Element{}
