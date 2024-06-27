@@ -32,6 +32,16 @@ func New() (VFD, error) {
 		return nil, err
 	}
 
+	usrBz, err := kss.Usr().Marshal()
+	if err != nil {
+		return nil, err
+	}
+
+	valBz, err := kss.Val().Marshal()
+	if err != nil {
+		return nil, err
+	}
+
 	addr, err := bech32.ConvertAndEncode(kSonrHRP, kss.PublicKey().Bytes())
 	if err != nil {
 		return nil, err

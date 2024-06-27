@@ -12,7 +12,7 @@ type Vault struct {
 }
 
 func SeedTables(file fs.File) (*Vault, error) {
-	db, err := gorm.Open(sqlite.Open(":memory:?_pragma=foreign_keys(1)"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(file.Path()), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
