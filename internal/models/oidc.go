@@ -1,4 +1,4 @@
-package middleware
+package models
 
 type UserInfo struct {
 	Sub   string `json:"sub"`
