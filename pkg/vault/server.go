@@ -2,19 +2,32 @@ package vault
 
 import (
 	"context"
-	"github.com/di-dao/sonr/pkg/vault/middleware"
-	"github.com/di-dao/sonr/pkg/vault/routes"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/coocood/freecache"
+	"github.com/di-dao/sonr/pkg/vault/middleware"
+	"github.com/di-dao/sonr/pkg/vault/routes"
+	"github.com/labstack/echo/v4"
 )
 
+const kCacheSize = 100 * 1024 * 1024
+
 func Serve(ctx context.Context) {
+	// Configure the server
+	c := freecache.NewCache(kCacheSize)
 	e := echo.New()
-	middleware.UseCache(e)
+
+	// Use Middlewares
+	e.Use(middleware.RequestCaching(c))
+	e.Use(middleware.SessionCookies)
+
+	// Setup routes
 	routes.RegisterPages(e)
+
+	// Run the server
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
 	// Start server

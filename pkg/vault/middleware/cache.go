@@ -10,8 +10,6 @@ import (
 	"gopkg.in/mcuadros/go-defaults.v1"
 )
 
-const kCacheSize = 100 * 1024 * 1024
-
 // Config defiens the configuration for a cache middleware.
 type CacheConfig struct {
 	// TTL time to life of the cache.
@@ -30,20 +28,13 @@ type CacheConfig struct {
 	Cache func(r *http.Request) bool
 }
 
-func UseCache(e *echo.Echo) {
-	c := freecache.NewCache(kCacheSize)
-	e.Use(createCacheMiddleware(&CacheConfig{}, c))
-}
-
 type CacheMiddleware struct {
 	cfg   *CacheConfig
 	cache *freecache.Cache
 }
 
-func createCacheMiddleware(cfg *CacheConfig, cache *freecache.Cache) echo.MiddlewareFunc {
-	if cfg == nil {
-		cfg = &CacheConfig{}
-	}
+func RequestCaching(cache *freecache.Cache) echo.MiddlewareFunc {
+	cfg := &CacheConfig{}
 
 	defaults.SetDefaults(cfg)
 	m := &CacheMiddleware{cfg: cfg, cache: cache}

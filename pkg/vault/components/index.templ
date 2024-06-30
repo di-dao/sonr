@@ -9,13 +9,14 @@ templ head() {
 	</head>
 }
 
-templ Home() {
+templ Home(sessionID string) {
 	<html>
 		@head()
 		<body>
 			<div class="pt-24 flex flex-col items-center">
 				<sl-card class="card-basic">
 					This is just a basic card. No image, no header, and no footer. Just your content.
+					{ sessionID }
 				</sl-card>
 			</div>
 		</body>
