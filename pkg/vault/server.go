@@ -2,17 +2,18 @@ package vault
 
 import (
 	"context"
+	"github.com/di-dao/sonr/pkg/vault/middleware"
+	"github.com/di-dao/sonr/pkg/vault/routes"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/di-dao/sonr/pkg/vault/routes"
-	"github.com/labstack/echo/v4"
 )
 
 func Serve(ctx context.Context) {
 	e := echo.New()
+	middleware.UseCache(e)
 	routes.RegisterPages(e)
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
