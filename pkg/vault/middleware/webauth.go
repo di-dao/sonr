@@ -1,0 +1,4 @@
+package middleware
+
+func VerifyCredentialAttestation() {
+}

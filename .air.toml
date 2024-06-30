@@ -14,7 +14,7 @@ include_ext = ["go", "proto", "templ"]
 # Ignore these filename extensions or directories.
 exclude_dir = ["api", "crypto", "pkl", "scripts", "tmp", ".github"]
 # Watch these directories if you specified.
-include_dir = ["pkg/vault", "x"]
+include_dir = ["pkg/vault", "x", "internal"]
 # Watch these files.
 include_file = []
 # Exclude files.
