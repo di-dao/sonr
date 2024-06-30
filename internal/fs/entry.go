@@ -2,34 +2,31 @@ package fs
 
 import (
 	"gorm.io/gorm"
+	"time"
 )
 
 type FSEntry struct {
 	gorm.Model
-	LocalPath     string
-	IPFSPath      string
-	Address       string
-	Synced        bool
-	Encrypted     bool
-	Published     bool
-	LastSyncTime  time.Time
+	LocalPath       string
+	IPFSPath        string
+	Address         string
+	Synced          bool
+	Encrypted       bool
+	Published       bool
+	LastSyncTime    time.Time
 	LastPublishTime time.Time
 }
 
 func CreateFSEntry(f Folder) *FSEntry {
 	return &FSEntry{
-		LocalPath:     f.Path(),
-		Address:       f.Name(),
-		Synced:        false,
-		Encrypted:     false,
-		Published:     false,
-		LastSyncTime:  time.Time{},
-		LastPublishTime: time.Time{},
+		LocalPath:       f.Path(),
+		Address:         f.Name(),
+		Synced:          false,
+		Encrypted:       false,
+		Published:       false,
+		LastSyncTime:    time.Now(),
+		LastPublishTime: time.Now(),
 	}
-}
-
-func (f *FSEntry) SetSynced() {
-	f.Synced = true
 }
 
 func (f *FSEntry) SetEncrypted() {

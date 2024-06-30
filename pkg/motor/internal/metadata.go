@@ -2,7 +2,7 @@ package internal
 
 import (
 	"github.com/di-dao/sonr/internal/models"
-	"github.com/di-dao/sonr/pkg/fs"
+	"github.com/di-dao/sonr/internal/fs"
 )
 
 type Status interface{}

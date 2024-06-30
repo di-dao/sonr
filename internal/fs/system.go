@@ -86,7 +86,7 @@ func SyncFolderToIPFS(ctx context.Context, f Folder) (path.Path, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	localFolder.SetSynced(path.String())
 	if err := ipfsDB.Save(localFolder).Error; err != nil {
 		return nil, err

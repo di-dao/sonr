@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/di-dao/sonr/crypto/kss"
-	"github.com/di-dao/sonr/pkg/fs"
+	"github.com/di-dao/sonr/internal/fs"
 )
 
 const (
