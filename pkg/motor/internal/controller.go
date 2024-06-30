@@ -28,6 +28,13 @@ func StoreKeyshares(folder fs.Folder, set kss.Set) (Controller, error) {
 	if err != nil {
 		return nil, err
 	}
-	folder.WriteFile(kUserKSFileName, usrBz, os.ModePerm)
-	return nil, nil
+	usrFile, err := folder.WriteFile(kUserKSFileName, usrBz, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+	valFile, err := folder.WriteFile(kValKSFileName, valBz, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+	return &enclave{usrFile, valFile}, nil
 }

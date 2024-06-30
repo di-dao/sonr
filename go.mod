@@ -88,6 +88,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240205150955-31a09d347014
 	google.golang.org/grpc v1.62.0
 	google.golang.org/protobuf v1.33.0
+	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.10
 	lukechampine.com/blake3 v1.2.2
 )
@@ -243,6 +244,7 @@ require (
 	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/miekg/dns v1.1.58 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
