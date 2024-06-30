@@ -7,4 +7,6 @@ import (
 
 func RegisterPages(e *echo.Echo) {
 	e.GET("/", handlers.HandleHomePage)
+	e.GET("/login", handlers.HandleLoginPage)
+	e.GET("/register", handlers.HandleRegisterPage)
 }

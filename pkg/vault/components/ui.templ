@@ -1,0 +1,54 @@
+package components
+
+templ Header(title, description string) {
+	<div class="flex flex-col gap-2">
+		<h1 class="text-3xl font-bold">{ title }</h1>
+		<p class="text-gray-600">{ description }</p>
+	</div>
+	<sl-divider></sl-divider>
+}
+
+templ Form(id string) {
+	<form id={ id } class="flex flex-col gap-x-2 gap-y-4 pt-3">
+		{ children... }
+	</form>
+}
+
+templ NameInput() {
+	<div class="flex flex-row gap-2">
+		<sl-input name="first_name" pattern="[A-Za-z]+" label="First Name" placeholder="Satoshi" required></sl-input>
+		<sl-input name="last_name" pattern="[A-Za-z]+" label="Last Name" placeholder="Nakamoto" required></sl-input>
+	</div>
+}
+
+templ HandleInput(required bool) {
+	<sl-input name="handle" pattern="[A-Za-z]+" label="Handle" placeholder="really_satoshi" required?={ required }></sl-input>
+}
+
+templ EmailInput(required bool) {
+	<sl-input name="email" type="email" label="Email" placeholder="satoshi@gmx.com" required?={ required }></sl-input>
+}
+
+templ ResetButton(title string, variant string) {
+	<sl-button type="reset" variant={ variant }>
+		{ title }
+	</sl-button>
+}
+
+templ SubmitButton(title string, variant string) {
+	<sl-button type="submit" variant={ variant }>
+		{ title }
+	</sl-button>
+}
+
+templ PrimaryButton(href string, title string) {
+	<sl-button href={ href } size="medium" variant="primary" pill>
+		{ title }
+	</sl-button>
+}
+
+templ SecondaryButton(href string, title string) {
+	<sl-button href={ href } size="medium" pill>
+		{ title }
+	</sl-button>
+}

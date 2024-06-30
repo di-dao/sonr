@@ -7,6 +7,5 @@ import (
 )
 
 func HandleRegisterPage(e echo.Context) error {
-	id := middleware.SessionID(e)
-	return middleware.Render(e, pages.Home(id))
+	return middleware.Render(e, pages.Register(middleware.SessionID(e)))
 }

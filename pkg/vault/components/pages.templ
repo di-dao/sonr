@@ -1,0 +1,35 @@
+package components
+
+templ Home(sessionID string) {
+	@RootLayout() {
+		@Container() {
+			@Header("Sonr.ID", "The most secure crypto wallet ever made.")
+			This is just a basic card. No image, no header, and no footer
+		}
+		@Footer(sessionID)
+	}
+}
+
+templ Login(sessionID string) {
+	@RootLayout() {
+		@Container() {
+			@Header("Login", "Authenticate with your existing Sonr Identity.")
+			This is the Login page.
+		}
+		@Footer(sessionID)
+	}
+}
+
+templ Register(sessionID string) {
+	@RootLayout() {
+		@Container() {
+			@Header("Register", "Begin your Interchain Journey securely with a Sonr Identity.")
+			@Form("register-form") {
+				@NameInput()
+				@EmailInput(true)
+				@SubmitButton("Register", "/")
+			}
+		}
+		@Footer(sessionID)
+	}
+}

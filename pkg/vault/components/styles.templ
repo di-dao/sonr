@@ -8,17 +8,3 @@ templ head() {
 		<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"></script>
 	</head>
 }
-
-templ Home(sessionID string) {
-	<html>
-		@head()
-		<body>
-			<div class="pt-24 flex flex-col items-center">
-				<sl-card class="card-basic">
-					This is just a basic card. No image, no header, and no footer. Just your content.
-					{ sessionID }
-				</sl-card>
-			</div>
-		</body>
-	</html>
-}

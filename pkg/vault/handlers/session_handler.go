@@ -7,6 +7,5 @@ import (
 )
 
 func HandleHomePage(e echo.Context) error {
-	id := middleware.SessionID(e)
-	return middleware.Render(e, components.Home(id))
+	return middleware.Render(e, components.Home(middleware.SessionID(e)))
 }
