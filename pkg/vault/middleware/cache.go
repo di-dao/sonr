@@ -16,7 +16,7 @@ func init() {
 	}
 }
 
-func Cache(next echo.HandlerFunc) echo.HandlerFunc {
+func SessionCache(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		sessionID := SessionID(c)
 		if sessionID == "" {
