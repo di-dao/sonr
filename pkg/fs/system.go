@@ -54,7 +54,7 @@ func NewVaultFolder(name string) (Folder, error) {
 		return "", err
 	}
 	entry := CreateFSEntry(vaultFolder)
-	if err := ipfsDB.Create(&entry).Error; err != nil {
+	if err := ipfsDB.Create(entry).Error; err != nil {
 		return "", err
 	}
 	return vaultFolder, nil
@@ -73,13 +73,21 @@ func SyncFolderToIPFS(ctx context.Context, f Folder) (path.Path, error) {
 
 	// Get folder from ipfsDB
 	localFolder := new(FSEntry)
-	ipfsDB.First(&localFolder, "path =?", f.Path())
+	result := ipfsDB.First(localFolder, "local_path = ?", f.Path())
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			localFolder = CreateFSEntry(f)
+		} else {
+			return nil, result.Error
+		}
+	}
 
 	path, err := c.Unixfs().Add(ctx, node)
 	if err != nil {
 		return nil, err
 	}
-	localFolder.IPFSPath = path.String()
+	
+	localFolder.SetSynced(path.String())
 	if err := ipfsDB.Save(localFolder).Error; err != nil {
 		return nil, err
 	}
@@ -93,7 +101,18 @@ func PublishToIPNS(ctx context.Context, ipfsPath path.Path, f Folder) error {
 		return err
 	}
 	_, err = c.Name().Publish(ctx, ipfsPath, options.Name.Key(f.Name()))
-	return err
+	if err != nil {
+		return err
+	}
+
+	localFolder := new(FSEntry)
+	result := ipfsDB.First(localFolder, "local_path = ?", f.Path())
+	if result.Error != nil {
+		return result.Error
+	}
+
+	localFolder.SetPublished()
+	return ipfsDB.Save(localFolder).Error
 }
 
 // LoadFromIPFS loads a Folder from IPFS
