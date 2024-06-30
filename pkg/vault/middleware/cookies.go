@@ -17,10 +17,6 @@ func SessionCookies(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func SessionID(c echo.Context) string {
-	return readCookie(c, "session")
-}
-
 func readCookie(c echo.Context, key string) string {
 	cookie, err := c.Cookie(key)
 	if err != nil {
