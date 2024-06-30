@@ -4,9 +4,12 @@ templ Home(sessionID string) {
 	@RootLayout() {
 		@Container() {
 			@Header("Sonr.ID", "The most secure crypto wallet ever made.")
-			This is just a basic card. No image, no header, and no footer
+			@Rows() {
+				@SecondaryButton("Login", "/login")
+				@PrimaryButton("Register", "/register")
+			}
 		}
-		@Footer(sessionID)
+		@footer(sessionID)
 	}
 }
 
@@ -16,7 +19,7 @@ templ Login(sessionID string) {
 			@Header("Login", "Authenticate with your existing Sonr Identity.")
 			This is the Login page.
 		}
-		@Footer(sessionID)
+		@footer(sessionID)
 	}
 }
 
@@ -26,10 +29,10 @@ templ Register(sessionID string) {
 			@Header("Register", "Begin your Interchain Journey securely with a Sonr Identity.")
 			@Form("register-form") {
 				@NameInput()
-				@EmailInput(true)
-				@SubmitButton("Register", "/")
+				@HandleInput(true)
+				@SubmitButton("Register")
 			}
 		}
-		@Footer(sessionID)
+		@footer(sessionID)
 	}
 }

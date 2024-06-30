@@ -6,6 +6,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func HandleLoginPage(e echo.Context) error {
+var Login = loginHandler{}
+
+type loginHandler struct{}
+
+func (h loginHandler) Page(e echo.Context) error {
 	return middleware.Render(e, pages.Login(middleware.SessionID(e)))
 }

@@ -6,6 +6,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func HandleRegisterPage(e echo.Context) error {
+var Register = registerHandler{}
+
+type registerHandler struct{}
+
+func (h registerHandler) Page(e echo.Context) error {
 	return middleware.Render(e, pages.Register(middleware.SessionID(e)))
 }

@@ -29,25 +29,25 @@ templ EmailInput(required bool) {
 	<sl-input name="email" type="email" label="Email" placeholder="satoshi@gmx.com" required?={ required }></sl-input>
 }
 
-templ ResetButton(title string, variant string) {
-	<sl-button type="reset" variant={ variant }>
+templ ResetButton(title string) {
+	<sl-button type="reset" variant="neutral">
 		{ title }
 	</sl-button>
 }
 
-templ SubmitButton(title string, variant string) {
-	<sl-button type="submit" variant={ variant }>
+templ SubmitButton(title string) {
+	<sl-button type="submit" variant="primary">
 		{ title }
 	</sl-button>
 }
 
-templ PrimaryButton(href string, title string) {
+templ PrimaryButton(title string, href string) {
 	<sl-button href={ href } size="medium" variant="primary" pill>
 		{ title }
 	</sl-button>
 }
 
-templ SecondaryButton(href string, title string) {
+templ SecondaryButton(title string, href string) {
 	<sl-button href={ href } size="medium" pill>
 		{ title }
 	</sl-button>
