@@ -10,6 +10,7 @@ import (
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
 	"github.com/ipfs/kubo/core/coreiface/options"
+	"gorm.io/gorm"
 )
 
 // Constant for the name of the folder where the vaults are stored
@@ -17,6 +18,10 @@ const kVaultsFolderName = ".sonr-vaults"
 
 // VaultsFolder is the folder where the vaults are stored
 var VaultsFolder Folder
+
+type ipfsDB struct {
+	DB *gorm.DB
+}
 
 // Package initializes the VaultsFolder
 func init() {

@@ -17,6 +17,7 @@ type PrimaryKey struct {
 // Element is the element for the BLS scheme
 type Element = accumulator.Element
 
+// NewKey creates a new primary key
 func NewKey(propertyKey string, pubKey crypto.PublicKey) (*PrimaryKey, error) {
 	// Concatenate the controller's public key and the property key
 	input := append(pubKey.Bytes(), []byte(propertyKey)...)
