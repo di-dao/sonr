@@ -17,7 +17,7 @@ tasks:
     cmd: templ generate
 
   build:vltd:
-    cmd: go build -o /bin/vltd ./cmd/vltd
+    cmd: go build -o ./bin/vltd ./cmd/vltd
 
   build:sonrd:
-    cmd: go build -o /bin/sonrd ./cmd/sonrd
+    cmd: go build -o ./bin/sonrd ./cmd/sonrd
