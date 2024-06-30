@@ -1,4 +1,4 @@
-package motr
+package motor
 
 import (
 	"github.com/cosmos/cosmos-sdk/types/bech32"
@@ -28,16 +28,6 @@ type drive struct {
 // NewVFS creates a new virtual file system.
 func New() (VFD, error) {
 	kss, err := mpc.GenerateKss()
-	if err != nil {
-		return nil, err
-	}
-
-	usrBz, err := kss.Usr().Marshal()
-	if err != nil {
-		return nil, err
-	}
-
-	valBz, err := kss.Val().Marshal()
 	if err != nil {
 		return nil, err
 	}

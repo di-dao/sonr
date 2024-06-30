@@ -27,6 +27,8 @@ type CredentialFlags struct {
 // Credential contains all needed information about a WebAuthn credential for storage.
 type Credential struct {
 	gorm.Model
+	DisplayName     string
+	Origin          string
 	Controller      string
 	AttestationType string                            `json:"attestationType"`
 	ID              []byte                            `json:"id"`
