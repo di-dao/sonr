@@ -1,8 +1,6 @@
-package models
+package fs
 
 import (
-	"path/filepath"
-
 	"gorm.io/gorm"
 )
 
@@ -15,10 +13,10 @@ type FSEntry struct {
 	Encrypted bool
 }
 
-func CreateFSEntry(localPath string) *FSEntry {
+func CreateFSEntry(f Folder) *FSEntry {
 	return &FSEntry{
-		LocalPath: localPath,
-		Address:   filepath.Base(localPath),
+		LocalPath: f.Path(),
+		Address:   f.Name(),
 		Synced:    false,
 		Encrypted: false,
 	}

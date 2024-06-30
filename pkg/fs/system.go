@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/glebarez/sqlite"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
 	"github.com/ipfs/kubo/core/coreiface/options"
@@ -19,9 +20,8 @@ const kVaultsFolderName = ".sonr-vaults"
 // VaultsFolder is the folder where the vaults are stored
 var VaultsFolder Folder
 
-type ipfsDB struct {
-	DB *gorm.DB
-}
+// ipfsDB keeps track of the sync between IPFS and the local filesystem
+var ipfsDB *gorm.DB
 
 // Package initializes the VaultsFolder
 func init() {
@@ -38,6 +38,12 @@ func init() {
 			panic(err)
 		}
 	}
+
+	// Open in memory sqlite database
+	ipfsDB, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
 }
 
 // NewVaultFolder creates a new folder under the VaultsFolder directory
@@ -45,6 +51,10 @@ func NewVaultFolder(name string) (Folder, error) {
 	vaultFolder := VaultsFolder.Join(name)
 	err := vaultFolder.Create()
 	if err != nil {
+		return "", err
+	}
+	entry := CreateFSEntry(vaultFolder)
+	if err := ipfsDB.Create(&entry).Error; err != nil {
 		return "", err
 	}
 	return vaultFolder, nil
@@ -60,11 +70,24 @@ func SyncFolderToIPFS(ctx context.Context, f Folder) (path.Path, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.Unixfs().Add(ctx, node)
+
+	// Get folder from ipfsDB
+	localFolder := new(FSEntry)
+	ipfsDB.First(&localFolder, "path =?", f.Path())
+
+	path, err := c.Unixfs().Add(ctx, node)
+	if err != nil {
+		return nil, err
+	}
+	localFolder.IPFSPath = path.String()
+	if err := ipfsDB.Save(localFolder).Error; err != nil {
+		return nil, err
+	}
+	return path, nil
 }
 
 // PublishToIPNS publishes the Folder to IPNS
-func (f Folder) PublishToIPNS(ctx context.Context, ipfsPath path.Path) error {
+func PublishToIPNS(ctx context.Context, ipfsPath path.Path, f Folder) error {
 	c, err := getIPFSClient()
 	if err != nil {
 		return err
