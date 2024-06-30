@@ -10,10 +10,6 @@ func SessionID(c echo.Context) string {
 }
 
 func Challenge(c echo.Context) protocol.URLEncodedBase64 {
-	val, err := getCacheKV(c, "challenge")
-	if err != nil {
-		chal, _ := protocol.CreateChallenge()
-		setCacheKV(c, "challenge", chal.String())
-	}
-	return protocol.URLEncodedBase64(val)
+	chal, _ := protocol.CreateChallenge()
+	return protocol.URLEncodedBase64(chal)
 }
