@@ -37,15 +37,27 @@ func (c cacheHandler) GetChallenge(e echo.Context) protocol.URLEncodedBase64 {
 }
 
 func (c cacheHandler) GetLocalPath(e echo.Context) string {
+	key := cacheKey(e, "localPath")
+	if x, found := localFSStore.Get(key); found {
+		return x.(string)
+	}
 	return ""
 }
 
 func (c cacheHandler) GetRemoteCID(e echo.Context) path.Path {
+	key := cacheKey(e, "remoteCID")
+	if x, found := remoteFSStore.Get(key); found {
+		return x.(path.Path)
+	}
 	return nil
 }
 
 func (c cacheHandler) SetLocalPath(e echo.Context, path string) {
+	key := cacheKey(e, "localPath")
+	localFSStore.Set(key, path, cache.DefaultExpiration)
 }
 
 func (c cacheHandler) SetRemoteCID(e echo.Context, path path.Path) {
+	key := cacheKey(e, "remoteCID")
+	remoteFSStore.Set(key, path, cache.DefaultExpiration)
 }
