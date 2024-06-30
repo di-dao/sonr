@@ -39,11 +39,3 @@ func writeCookie(c echo.Context, key string, value string) {
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 	c.SetCookie(cookie)
 }
-
-// ClearSessionCache clears the cache for a specific session
-func ClearSessionCache(c echo.Context) {
-	sessionID := SessionID(c)
-	if sessionID != "" {
-		cache.Del(sessionID + ":*")
-	}
-}

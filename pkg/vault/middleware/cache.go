@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"github.com/echovault/echovault/echovault"
 	"github.com/labstack/echo/v4"
 	"github.com/segmentio/ksuid"
-	"github.com/EchoVault/EchoVault/pkg/echovault"
 )
 
 var cache *echovault.EchoVault
@@ -50,9 +50,8 @@ func Cache(next echo.HandlerFunc) echo.HandlerFunc {
 		cacheEntry := recorder.Result()
 		encodedEntry, err := cacheEntry.Encode()
 		if err == nil {
-			cache.Set(cacheKey, string(encodedEntry), echovault.SETOptions{})
+			cache.Set(cacheKey, string(encodedEntry), echovault.SetOptions{})
 		}
-
 		return nil
 	}
 }
