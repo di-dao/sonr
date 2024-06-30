@@ -6,6 +6,7 @@ option go_package = "github.com/di-dao/sonr/x/did/types";
 import "cosmos/orm/v1/orm.proto";
 import "did/v1/genesis.proto";
 
+
 // Authenticator is the representation of a Credential Assertion.
 message Authenticator {
   option (cosmos.orm.v1.table) = {

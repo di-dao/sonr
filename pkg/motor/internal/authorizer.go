@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/di-dao/sonr/pkg/fs"
+import "github.com/di-dao/sonr/internal/fs"
 
 func Lock(dir fs.Folder) {
 }

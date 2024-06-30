@@ -26,7 +26,6 @@ func (gs GenesisState) Validate() error {
 // DefaultParams returns default module parameters.
 func DefaultParams() Params {
 	return Params{
-		AcceptedCoins: DefaultCoins(),
 		PropertyAllowlist: []string{
 			"email",
 			"phone",

@@ -9,27 +9,6 @@ option go_package = "github.com/di-dao/sonr/x/did/types";
 message GenesisState {
   // Params defines all the paramaters of the module.
   Params params = 1 [(gogoproto.nullable) = false];
-
-}
-
-// Coin is the struct that represents a coin
-message Coin {
-  option (amino.name) = "did/coin";
-
-  // Denom is the denomination of the coin
-  int64 index = 1;
-
-  // Path is the path component of the coin as hex
-  uint32 path = 2;
-
-  // Symbol is the symbol of the coin
-  string symbol = 3;
-
-  // Name is the name of the coin
-  string name = 4;
-
-  // HRP is the human readable part of the coin for Bech32 encoding
-  string hrp = 5;
 }
 
 // Params defines the set of module parameters.
@@ -37,9 +16,6 @@ message Params {
   option (amino.name) = "did/params";
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;
-
-  // Accepted Coins defines all the accepted coins of the module.
-    repeated Coin accepted_coins = 1 [(gogoproto.nullable) = false];
 
   // Property Allowlist
   repeated string property_allowlist = 2;

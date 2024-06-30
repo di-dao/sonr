@@ -6,6 +6,7 @@ package did.v1;
 import "cosmos/auth/v1beta1/auth.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
+import "did/v1/genesis.proto";
 
 option go_package = "github.com/di-dao/sonr/x/did/types";
 
@@ -38,4 +39,12 @@ message DIDDocument {
   repeated string capability_delegation = 7;
   repeated string capability_invocation = 8;
 }
+
+// VerificationMethod defines a verification method
+message VerificationMethod {
+  string id = 1;
+  string controller = 2;
+  PublicKey public_key = 3;
+}
+
 

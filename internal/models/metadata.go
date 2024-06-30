@@ -7,7 +7,7 @@ import (
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/accumulator"
 	"github.com/di-dao/sonr/crypto/secret"
-	"github.com/di-dao/sonr/pkg/fs"
+	"github.com/di-dao/sonr/internal/fs"
 	"github.com/ipfs/boxo/path"
 )
 

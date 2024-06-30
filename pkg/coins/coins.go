@@ -1,9 +1,5 @@
 package coins
 
-import (
-	"github.com/di-dao/sonr/x/did/types"
-)
-
 // Coin represents a cryptocurrency
 type Coin interface {
 	// FormatAddress formats a public key into an address
@@ -24,9 +20,9 @@ type Coin interface {
 
 // DefaultCoins is a list of default coins used in the vault
 var DefaultCoins = []Coin{
-	types.CoinBTC,
-	types.CoinETH,
-	types.CoinSNR,
+	CoinBTC,
+	CoinETH,
+	CoinSNR,
 }
 
 var (
