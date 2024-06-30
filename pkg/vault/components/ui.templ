@@ -8,12 +8,6 @@ templ Header(title, description string) {
 	<sl-divider></sl-divider>
 }
 
-templ Form(id string) {
-	<form id={ id } class="flex flex-col gap-x-2 gap-y-4 pt-3">
-		{ children... }
-	</form>
-}
-
 templ NameInput() {
 	<div class="flex flex-row gap-2">
 		<sl-input name="first_name" pattern="[A-Za-z]+" label="First Name" placeholder="Satoshi" required></sl-input>

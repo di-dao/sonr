@@ -8,10 +8,9 @@ import (
 
 type ResponseRecorder struct {
 	http.ResponseWriter
-
-	status       int
-	body         bytes.Buffer
 	headers      http.Header
+	body         bytes.Buffer
+	status       int
 	headerCopied bool
 }
 
@@ -68,8 +67,8 @@ func copyHeaders(src, dst http.Header) {
 
 type CacheEntry struct {
 	Header     http.Header
-	StatusCode int
 	Body       []byte
+	StatusCode int
 }
 
 func (c *CacheEntry) Encode() ([]byte, error) {

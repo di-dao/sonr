@@ -23,16 +23,14 @@ templ Login(sessionID string) {
 	}
 }
 
-templ Register(sessionID string) {
+templ Register(sessionID string, challenge string) {
 	@RootLayout() {
 		@Container() {
 			@Header("Register", "Begin your Interchain Journey securely with a Sonr Identity.")
-			@Form("register-form") {
-				@NameInput()
-				@HandleInput(true)
-				@SubmitButton("Register")
-			}
+			@NameInput()
+			@HandleInput(true)
+			@SubmitButton("Register")
 		}
-		@footer(sessionID)
 	}
+	@footer(sessionID)
 }
