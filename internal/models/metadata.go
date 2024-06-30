@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/di-dao/sonr/crypto"
@@ -12,6 +13,11 @@ import (
 
 // Accumulators represents accumulated data of secret data of a resource.
 type Accumulators map[string][]byte
+
+// CreateAccumulators returns a new Accumulators
+func CreateAccumulators() Accumulators {
+	return make(map[string][]byte)
+}
 
 // Marshal returns the JSON encoding of the Accumulators
 func (i Accumulators) Marshal() ([]byte, error) {
@@ -52,6 +58,13 @@ type Metadata struct {
 	PeerID                 string           `json:"peerId"`
 	SupportedDenominations []string         `json:"supportedDenominations"`
 	Number                 int              `json:"number"`
+}
+
+// CreateMetadata returns a new Metadata
+func CreateMetadata(ctx context.Context) *Metadata {
+	return &Metadata{
+		Accumulators: CreateAccumulators(),
+	}
 }
 
 // Marshal returns the JSON encoding of the Metadata

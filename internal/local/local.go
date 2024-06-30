@@ -1,9 +1,6 @@
 package local
 
 import (
-	"os"
-
-	"github.com/di-dao/sonr/crypto/daed"
 	"github.com/ipfs/kubo/client/rpc"
 )
 
@@ -12,10 +9,6 @@ var (
 	valAddr           = "val1"
 	nodeDir           = ".sonr"
 	contextSessionKey = contextKey("session-id")
-
-	defaultNodeHome = os.ExpandEnv("$HOME/") + nodeDir
-
-	kh *daed.AESSIV
 )
 
 // Initialize initializes the local configuration values
