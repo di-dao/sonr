@@ -1,7 +1,7 @@
-package motr
+package motor
 
 import (
-	"github.com/di-dao/sonr/internal/motr/models"
+	"github.com/di-dao/sonr/internal/models"
 	"github.com/di-dao/sonr/pkg/fs"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"

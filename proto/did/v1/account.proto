@@ -28,3 +28,14 @@ message EthAccount {
   // controller is the address of the controller
   string controller = 3 [(gogoproto.moretags) = "yaml:\"controller\""];
 }
+
+// DIDDocument defines a DID document
+message DIDDocument {
+  string id = 1;
+  repeated VerificationMethod verification_methods = 2;
+  repeated string authentication = 4;
+  repeated string assertion_method = 5;
+  repeated string capability_delegation = 7;
+  repeated string capability_invocation = 8;
+}
+

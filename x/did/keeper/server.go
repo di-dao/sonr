@@ -23,35 +23,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 // InitializeController implements types.MsgServer.
 func (ms msgServer) InitializeController(goCtx context.Context, msg *types.MsgInitializeController) (*types.MsgInitializeControllerResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	inserted := 0
-	if assertionList, err := msg.GetAssertionList(); err != nil {
-		for _, assertion := range assertionList {
-			err := ms.k.OrmDB.AuthenticatorTable().Insert(ctx, assertion)
-			if err != nil {
-				return nil, err
-			}
-			inserted++
-		}
-	}
-	if keyshareList, err := msg.GetKeyshareList(); err != nil {
-		for _, keyshare := range keyshareList {
-			err := ms.k.OrmDB.KeyshareTable().Insert(ctx, keyshare)
-			if err != nil {
-				return nil, err
-			}
-			inserted++
-		}
-	}
-	if verificationList, err := msg.GetVerificationList(); err != nil {
-		for _, verification := range verificationList {
-			err := ms.k.OrmDB.ProofTable().Insert(ctx, verification)
-			if err != nil {
-				return nil, err
-			}
-			inserted++
-		}
-	}
+	_ = sdk.UnwrapSDKContext(goCtx)
 	return &types.MsgInitializeControllerResponse{}, nil
 }
 
