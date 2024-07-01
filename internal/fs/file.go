@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -31,8 +32,11 @@ func (f File) Read() ([]byte, error) {
 	return os.ReadFile(string(f))
 }
 
-// Write writes data to the file
+// Write writes data to the file, but throws an error if the file already exists
 func (f File) Write(data []byte) error {
+	if f.Exists() {
+		return fmt.Errorf("file already exists: %s", f)
+	}
 	return os.WriteFile(string(f), data, 0644)
 }
 
@@ -46,6 +50,19 @@ func (f File) Append(data []byte) error {
 
 	_, err = file.Write(data)
 	return err
+}
+
+// Overwrite deletes all data for the file at path if it exists and writes the new data
+func (f File) Overwrite(data []byte) error {
+	// If the file exists, remove it first
+	if f.Exists() {
+		if err := f.Remove(); err != nil {
+			return fmt.Errorf("failed to remove existing file: %w", err)
+		}
+	}
+	
+	// Write the new data
+	return os.WriteFile(string(f), data, 0644)
 }
 
 // Exists checks if the file exists
