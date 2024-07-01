@@ -20,6 +20,7 @@ func (f *fingerprint) Lock(dir fs.Folder) {
 	if err != nil {
 		return
 	}
+	pk.CreateAccumulator()
 }
 
 func Unlock(dir fs.Folder) {

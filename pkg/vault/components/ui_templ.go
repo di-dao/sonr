@@ -297,8 +297,8 @@ func PasskeyButton(formId string) templ.Component {
 
 func createCredential(formId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_createCredential_a747`,
-		Function: `function __templ_createCredential_a747(formId){// Base64 encoding and decoding functions
+		Name: `__templ_createCredential_190e`,
+		Function: `function __templ_createCredential_190e(formId){// Base64 encoding and decoding functions
   function arrayBufferToBase64(buffer) {
     return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
       .replace(/\+/g, "-")
@@ -314,38 +314,53 @@ func createCredential(formId string) templ.ComponentScript {
     }
     return bytes.buffer;
   }
-    let credential = navigator.credentials.create({
-        publicKey: {
-            challenge: new Uint8Array([117, 61, 252, 231, 191, 241]),
-            rp: {  name: "ACME Corporation" },
-            user: {
-                id: new Uint8Array([79, 252, 83, 72, 214, 7, 89, 26]),
-                name: "jamiedoe",
-                displayName: "Jamie Doe"
-            },
-            pubKeyCredParams: [ {type: "public-key", alg: -7} ]
-        }
-    }).then(credential => {
-        // Prepare the credential data
-        let credentialData = {
-            id: credential.id,
-            type: credential.type,
-            rawId: arrayBufferToBase64(credential.rawId),
-            response: {
-                clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
-                attestationObject: arrayBufferToBase64(credential.response.attestationObject)            
-            },
-            clientExtensionResults: credential.getClientExtensionResults()
-        };
 
-        // Set the serialized credential data as the form value
-        document.getElementById('credentialData').value = JSON.stringify(credentialData);
+  // Check if the form is valid
+  const form = document.getElementById(formId);
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
 
-        // Submit the form
-        document.getElementById(formId).submit();
-    });
+  // Get user information from the form
+  const name = document.getElementById('name').value;
+  const handle = document.getElementById('handle').value;
+
+  let credential = navigator.credentials.create({
+    publicKey: {
+      challenge: new Uint8Array([117, 61, 252, 231, 191, 241]),
+      rp: { name: "ACME Corporation" },
+      user: {
+        id: new Uint8Array([79, 252, 83, 72, 214, 7, 89, 26]),
+        name: handle,
+        displayName: name
+      },
+      pubKeyCredParams: [{ type: "public-key", alg: -7 }]
+    }
+  }).then(credential => {
+    // Prepare the credential data
+    let credentialData = {
+      id: credential.id,
+      type: credential.type,
+      rawId: arrayBufferToBase64(credential.rawId),
+      response: {
+        clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+        attestationObject: arrayBufferToBase64(credential.response.attestationObject)            
+      },
+      clientExtensionResults: credential.getClientExtensionResults()
+    };
+
+    // Set the serialized credential data as the form value
+    document.getElementById('credentialData').value = JSON.stringify(credentialData);
+
+    // Submit the form
+    form.submit();
+  }).catch(error => {
+    console.error('Error creating credential:', error);
+    // Handle the error (e.g., show an error message to the user)
+  });
 }`,
-		Call:       templ.SafeScript(`__templ_createCredential_a747`, formId),
-		CallInline: templ.SafeScriptInline(`__templ_createCredential_a747`, formId),
+		Call:       templ.SafeScript(`__templ_createCredential_190e`, formId),
+		CallInline: templ.SafeScriptInline(`__templ_createCredential_190e`, formId),
 	}
 }
