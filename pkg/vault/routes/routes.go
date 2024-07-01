@@ -10,6 +10,9 @@ func RegisterAPI(e *echo.Echo) {
 	e.POST("/api/register/finish", handlers.Register.Finish)
 }
 
+func RegisterOpenIDProvider(e *echo.Echo) {
+}
+
 func RegisterPages(e *echo.Echo) {
 	e.GET("/", handlers.Session.Page)
 	e.GET("/login", handlers.Login.Page)
