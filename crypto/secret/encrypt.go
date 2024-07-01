@@ -15,19 +15,8 @@ import (
 
 const AccumulatorMarshalledSize = 60
 
-type EncryptionScheme struct {
-	secretKey PrimaryKey
-}
-
-// NewEncryptionScheme creates a new NewEncryptionScheme
-func NewEncryptionScheme(secretKey PrimaryKey) *EncryptionScheme {
-	return &EncryptionScheme{
-		secretKey: secretKey,
-	}
-}
-
-func (es *EncryptionScheme) Encrypt(acc *accumulator.Accumulator, vaultCID string, message []byte) ([]byte, error) {
-	pub, _, err := es.deriveKyberKeypair(acc, vaultCID)
+func (s *PrimaryKey) Encrypt(acc *accumulator.Accumulator, vaultCID string, message []byte) ([]byte, error) {
+	pub, _, err := deriveKyberKeypair(acc, vaultCID)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +59,7 @@ func (es *EncryptionScheme) Encrypt(acc *accumulator.Accumulator, vaultCID strin
 }
 
 // Decrypt is
-func (es *EncryptionScheme) Decrypt(vaultCID string, encryptedData []byte, witness *accumulator.MembershipWitness, pubKey *accumulator.PublicKey) ([]byte, error) {
+func (s *PrimaryKey) Decrypt(vaultCID string, encryptedData []byte, witness *accumulator.MembershipWitness, pubKey *accumulator.PublicKey) ([]byte, error) {
 	if len(encryptedData) < kyber768.CiphertextSize+AccumulatorMarshalledSize {
 		return nil, fmt.Errorf("invalid encrypted data: too short")
 	}
@@ -83,7 +72,7 @@ func (es *EncryptionScheme) Decrypt(vaultCID string, encryptedData []byte, witne
 	}
 
 	// Derive Kyber keypair using the unmarshalled accumulator
-	_, priv, err := es.deriveKyberKeypair(&decryptedAcc, vaultCID)
+	_, priv, err := deriveKyberKeypair(&decryptedAcc, vaultCID)
 	if err != nil {
 		return nil, err
 	}
@@ -126,8 +115,8 @@ func (es *EncryptionScheme) Decrypt(vaultCID string, encryptedData []byte, witne
 	return plaintext, nil
 }
 
-func (es *EncryptionScheme) deriveKyberKeypair(acc *accumulator.Accumulator, vaultCID string) (*kyber768.PublicKey, *kyber768.PrivateKey, error) {
-	seed, err := es.generateDeterministicSeed(acc, vaultCID)
+func deriveKyberKeypair(acc *accumulator.Accumulator, vaultCID string) (*kyber768.PublicKey, *kyber768.PrivateKey, error) {
+	seed, err := generateDeterministicSeed(acc, vaultCID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -143,7 +132,7 @@ func (es *EncryptionScheme) deriveKyberKeypair(acc *accumulator.Accumulator, vau
 	return pub, priv, nil
 }
 
-func (es *EncryptionScheme) generateDeterministicSeed(acc *accumulator.Accumulator, vaultCID string) ([]byte, error) {
+func generateDeterministicSeed(acc *accumulator.Accumulator, vaultCID string) ([]byte, error) {
 	_, err := cid.Decode(vaultCID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid IPFS CID: %w", err)

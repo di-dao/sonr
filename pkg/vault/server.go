@@ -18,6 +18,7 @@ func Serve(ctx context.Context) {
 
 	// Use Middlewares
 	e.Use(middleware.SessionCookies)
+	e.Use(middleware.CacheStores)
 
 	// Setup routes
 	routes.RegisterPages(e)

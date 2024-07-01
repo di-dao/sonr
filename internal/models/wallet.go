@@ -15,6 +15,10 @@ type Wallet struct {
 	PublicKey  []byte `json:"publicKey"`
 	Index      int    `json:"index"`
 	CoinType   int64  `json:"coinType"`
+	Name       string `json:"name"`
+	ChainID    string `json:"chainId"`
+	Network    string `json:"network"`
+	Label      string `json:"label"`
 }
 
 // NewWallet creates a new account from a public key, coin, and index
