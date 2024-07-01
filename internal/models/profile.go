@@ -8,4 +8,5 @@ type Profile struct {
 	Name        string
 	Origin      string
 	Credentials []Credential
+	Controller  string
 }

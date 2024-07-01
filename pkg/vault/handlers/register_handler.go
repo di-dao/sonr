@@ -10,6 +10,14 @@ var Register = registerHandler{}
 
 type registerHandler struct{}
 
+func (h registerHandler) Start(e echo.Context) error {
+	return e.JSON(0, nil)
+}
+
+func (h registerHandler) Finish(e echo.Context) error {
+	return e.JSON(0, nil)
+}
+
 func (h registerHandler) Page(e echo.Context) error {
 	return middleware.Render(e, pages.Register(middleware.SessionID(e), string(middleware.Cache.GetChallenge(e))))
 }

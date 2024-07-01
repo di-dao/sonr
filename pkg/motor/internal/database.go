@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"github.com/di-dao/sonr/internal/models"
 	"github.com/di-dao/sonr/internal/fs"
+	"github.com/di-dao/sonr/internal/models"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
@@ -18,12 +18,12 @@ type Database interface {
 	InsertProfiles(profiles ...*models.Profile) error
 	InsertWallets(wallets ...*models.Wallet) error
 
-	ListCredentials(origin string) ([]*models.Credential, error)
+	ListCredentials() ([]*models.Credential, error)
 	ListProfiles() ([]*models.Profile, error)
 	ListWallets() ([]*models.Wallet, error)
 }
 
-func SeedTables(dir fs.Folder) (Database, error) {
+func seedTables(dir fs.Folder) (Database, error) {
 	file, err := dir.Touch(kVaultDBFileName)
 	if err != nil {
 		return nil, err
@@ -82,9 +82,9 @@ func (db *embedDB) InsertWallets(wallets ...*models.Wallet) error {
 	return nil
 }
 
-func (db *embedDB) ListCredentials(origin string) ([]*models.Credential, error) {
+func (db *embedDB) ListCredentials() ([]*models.Credential, error) {
 	var credentials []*models.Credential
-	db.DB.Find(&credentials, "origin = ?", origin)
+	db.DB.Find(&credentials)
 	return credentials, nil
 }
 

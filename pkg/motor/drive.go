@@ -5,15 +5,17 @@ import (
 	"github.com/di-dao/sonr/crypto/kss"
 	"github.com/di-dao/sonr/crypto/mpc"
 	"github.com/di-dao/sonr/internal/fs"
+	"github.com/di-dao/sonr/pkg/motor/internal"
 )
 
 const kSonrHRP = "idx"
 
 // vfd is the struct implementation of an IPFS file system
 type drive struct {
+	kss    kss.Set
+	vault  internal.Vault
 	folder fs.Folder
 	addr   string
-	kss    kss.Set
 }
 
 // NewVFS creates a new virtual file system.
@@ -32,10 +34,15 @@ func New() (*drive, error) {
 	if err != nil {
 		return nil, err
 	}
+	vlt, err := internal.InitializeVault(rootDir, kss, addr)
+	if err != nil {
+		return nil, err
+	}
 
 	return &drive{
 		folder: rootDir,
 		addr:   addr,
 		kss:    kss,
+		vault:  vlt,
 	}, nil
 }

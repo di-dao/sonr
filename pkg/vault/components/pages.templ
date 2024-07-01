@@ -29,7 +29,7 @@ templ Register(sessionID string, challenge string) {
 			@Header("Register", "Begin your Interchain Journey securely with a Sonr Identity.")
 			@Form("register") {
 				@NameInput()
-				@HandleInput(true)
+				@UsernameInput(true)
 				@SubmitButton("Register")
 			}
 		}
