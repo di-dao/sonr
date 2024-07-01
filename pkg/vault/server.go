@@ -22,6 +22,7 @@ func Serve(ctx context.Context) {
 
 	// Setup routes
 	routes.RegisterPages(e)
+	routes.RegisterAPI(e)
 
 	// Run the server
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)

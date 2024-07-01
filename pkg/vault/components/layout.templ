@@ -22,8 +22,8 @@ templ Container() {
 	</html>
 }
 
-templ Form(id string) {
-	<form id={ id } class="flex flex-col gap-x-2 gap-y-4 pt-3">
+templ Form(id, action, method string) {
+	<form id={ id } class="flex flex-col gap-x-2 gap-y-4 pt-3" action={ templ.URL(action) } method={ method }>
 		{ children... }
 	</form>
 }

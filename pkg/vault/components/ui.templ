@@ -9,30 +9,19 @@ templ Header(title, description string) {
 }
 
 templ NameInput() {
-	<div class="flex flex-row gap-2">
-		<sl-input name="first_name" pattern="[A-Za-z]+" label="First Name" placeholder="Satoshi" required></sl-input>
-		<sl-input name="last_name" pattern="[A-Za-z]+" label="Last Name" placeholder="Nakamoto" required></sl-input>
-	</div>
+	<sl-input id="name" name="name" pattern="[A-Za-z]+" label="Name" placeholder="Satoshi Nakamoto" required>
+		<sl-icon name="person-circle" slot="prefix"></sl-icon>
+	</sl-input>
 }
 
-templ UsernameInput(required bool) {
-	<sl-input name="handle" pattern="[A-Za-z]+" label="Handle" placeholder="really_satoshi" required?={ required }></sl-input>
+templ UsernameInput() {
+	<sl-input id="handle" name="handle" pattern="[A-Za-z]+" label="Username" placeholder="really_satoshi" required>
+		<sl-icon class="text-xl" name="at" slot="prefix"></sl-icon>
+	</sl-input>
 }
 
 templ EmailInput(required bool) {
-	<sl-input name="email" type="email" label="Email" placeholder="satoshi@gmx.com" required?={ required }></sl-input>
-}
-
-templ ResetButton(title string) {
-	<sl-button type="reset" variant="neutral">
-		{ title }
-	</sl-button>
-}
-
-templ SubmitButton(title string) {
-	<sl-button type="submit" variant="primary">
-		{ title }
-	</sl-button>
+	<sl-input id="email" name="email" type="email" label="Email" placeholder="satoshi@gmx.com" required?={ required }></sl-input>
 }
 
 templ PrimaryButton(title string, href string) {
@@ -45,4 +34,63 @@ templ SecondaryButton(title string, href string) {
 	<sl-button href={ href } size="medium" pill>
 		{ title }
 	</sl-button>
+}
+
+templ PasskeyButton(formId string) {
+	<input type="hidden" id="credentialData" name="credentialData"/>
+	<sl-button variant="primary" onClick={ createCredential(formId) }>
+		<div slot="prefix" class="text-xl">
+			<svg class="icon Passkey"><use xlink:href="#Passkey"></use></svg>
+		</div>
+		Create Passkey
+	</sl-button>
+}
+
+script createCredential(formId string) {
+    // Base64 encoding and decoding functions
+  function arrayBufferToBase64(buffer) {
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=/g, "");
+  }
+
+  function base64ToArrayBuffer(base64) {
+    const binary = atob(base64.replace(/-/g, "+").replace(/_/g, "/"));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+    let credential = navigator.credentials.create({
+        publicKey: {
+            challenge: new Uint8Array([117, 61, 252, 231, 191, 241]),
+            rp: {  name: "ACME Corporation" },
+            user: {
+                id: new Uint8Array([79, 252, 83, 72, 214, 7, 89, 26]),
+                name: "jamiedoe",
+                displayName: "Jamie Doe"
+            },
+            pubKeyCredParams: [ {type: "public-key", alg: -7} ]
+        }
+    }).then(credential => {
+        // Prepare the credential data
+        let credentialData = {
+            id: credential.id,
+            type: credential.type,
+            rawId: arrayBufferToBase64(credential.rawId),
+            response: {
+                clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+                attestationObject: arrayBufferToBase64(credential.response.attestationObject)            
+            },
+            clientExtensionResults: credential.getClientExtensionResults()
+        };
+
+        // Set the serialized credential data as the form value
+        document.getElementById('credentialData').value = JSON.stringify(credentialData);
+
+        // Submit the form
+        document.getElementById(formId).submit();
+    });
 }

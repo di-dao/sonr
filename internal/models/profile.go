@@ -7,6 +7,6 @@ type Profile struct {
 	DisplayName string
 	Name        string
 	Origin      string
-	Credentials []Credential
 	Controller  string
+	Credentials []Credential
 }
