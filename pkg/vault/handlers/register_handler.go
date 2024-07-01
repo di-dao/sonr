@@ -24,6 +24,6 @@ func (h registerHandler) Finish(e echo.Context) error {
 	return e.JSON(200, fmt.Sprintf("REGISTER: %s", string(cred.ID)))
 }
 
-func (h registerHandler) Page(e echo.Context) error {
+func (h registerHandler) FormPage(e echo.Context) error {
 	return middleware.Render(e, pages.Register(middleware.SessionID(e), string(middleware.Cache.GetChallenge(e))))
 }

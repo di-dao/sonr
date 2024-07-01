@@ -13,5 +13,5 @@ func RegisterAPI(e *echo.Echo) {
 func RegisterPages(e *echo.Echo) {
 	e.GET("/", handlers.Session.Page)
 	e.GET("/login", handlers.Login.Page)
-	e.GET("/register", handlers.Register.Page)
+	e.GET("/register", handlers.Register.FormPage)
 }
