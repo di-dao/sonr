@@ -1,8 +1,8 @@
 package internal
 
 import (
+	"fmt"
 	"github.com/di-dao/sonr/crypto"
-
 	"github.com/di-dao/sonr/crypto/secret"
 	"github.com/di-dao/sonr/internal/fs"
 	"github.com/di-dao/sonr/internal/models"
@@ -113,6 +113,9 @@ func (db *embedDB) ListWallets() ([]*models.Wallet, error) {
 
 func (db *embedDB) WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error) {
 	// Verify that did exists in the table
+	if !db.ExistsCredential(did) {
+		return nil, fmt.Errorf("credential with DID %s does not exist", did)
+	}
 
 	pk, err := secret.NewKey("credentials", publicKey)
 	if err != nil {
@@ -130,14 +133,85 @@ func (db *embedDB) WitnessCredential(publicKey crypto.PublicKey, did string) ([]
 	}
 
 	acc, err := pk.CreateAccumulator(credIDStrs...)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	return acc.Bytes(), nil
 }
 
-func (db *embedDB) WitnessProfiles(publicKey crypto.PublicKey, did string) ([]byte, error) {
-	return nil, nil
+func (db *embedDB) ExistsCredential(did string) bool {
+	var count int64
+	db.DB.Model(&models.Credential{}).Where("id = ?", did).Count(&count)
+	return count > 0
 }
 
-func (db *embedDB) WitnessWallets(publicKey crypto.PublicKey, did string) ([]byte, error) {
-	return nil, nil
+func (db *embedDB) ExistsProfile(did string) bool {
+	var count int64
+	db.DB.Model(&models.Profile{}).Where("id = ?", did).Count(&count)
+	return count > 0
+}
+
+func (db *embedDB) ExistsWallet(did string) bool {
+	var count int64
+	db.DB.Model(&models.Wallet{}).Where("id = ?", did).Count(&count)
+	return count > 0
+}
+
+func (db *embedDB) WitnessProfile(publicKey crypto.PublicKey, did string) ([]byte, error) {
+	// Verify that did exists in the table
+	if !db.ExistsProfile(did) {
+		return nil, fmt.Errorf("profile with DID %s does not exist", did)
+	}
+
+	pk, err := secret.NewKey("profiles", publicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	profiles, err := db.ListProfiles()
+	if err != nil {
+		return nil, err
+	}
+
+	profileIDs := make([]string, len(profiles))
+	for i, p := range profiles {
+		profileIDs[i] = p.ID
+	}
+
+	acc, err := pk.CreateAccumulator(profileIDs...)
+	if err != nil {
+		return nil, err
+	}
+
+	return acc.Bytes(), nil
+}
+
+func (db *embedDB) WitnessWallet(publicKey crypto.PublicKey, did string) ([]byte, error) {
+	// Verify that did exists in the table
+	if !db.ExistsWallet(did) {
+		return nil, fmt.Errorf("wallet with DID %s does not exist", did)
+	}
+
+	pk, err := secret.NewKey("wallets", publicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	wallets, err := db.ListWallets()
+	if err != nil {
+		return nil, err
+	}
+
+	walletIDs := make([]string, len(wallets))
+	for i, w := range wallets {
+		walletIDs[i] = w.ID
+	}
+
+	acc, err := pk.CreateAccumulator(walletIDs...)
+	if err != nil {
+		return nil, err
+	}
+
+	return acc.Bytes(), nil
 }
