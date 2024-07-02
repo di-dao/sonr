@@ -26,7 +26,8 @@ type Credential struct {
 	DisplayName     string
 	Origin          string
 	Controller      string
-	AttestationType string                            `json:"attestationType"`
+	AttestationType string `json:"attestationType"`
+	DID             string
 	ID              []byte                            `json:"id"`
 	PublicKey       []byte                            `json:"publicKey"`
 	Transport       []protocol.AuthenticatorTransport `json:"transport"`

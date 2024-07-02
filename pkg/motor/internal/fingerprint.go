@@ -1,31 +1,40 @@
 package internal
 
 import (
+	"os"
+
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
 	"github.com/di-dao/sonr/internal/fs"
-	"github.com/di-dao/sonr/internal/models"
 )
 
-type FingerprintAPI interface {
-	lock(credential *models.Credential)
-	unlock(credential *models.Credential)
-
-	Lock(did string)
-	Unlock(did string)
-}
-
-func (f *fingerprint) Lock(dir fs.Folder) {
-	pk, err := secret.NewKey("k", f.publicKey)
+func CreateFingerprint(dir fs.Folder, db Database, publicKey crypto.PublicKey) error {
+	pk, err := secret.NewKey("credentials", publicKey)
 	if err != nil {
-		return
+		return err
 	}
-	pk.CreateAccumulator()
-}
+	creds, err := db.ListCredentials()
+	if err != nil {
+		return err
+	}
 
-func Unlock(dir fs.Folder) {
-}
+	credIDStrs := make([]string, len(creds))
+	for i, c := range creds {
+		credIDStrs[i] = c.DID
+	}
 
-type fingerprint struct {
-	publicKey crypto.PublicKey
+	acc, err := pk.CreateAccumulator(credIDStrs...)
+	if err != nil {
+		return err
+	}
+
+	bz, err := acc.MarshalBinary()
+	if err != nil {
+		return err
+	}
+	_, err = dir.WriteFile("fingerprint", bz, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
 }

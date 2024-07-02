@@ -24,5 +24,9 @@ func InitializeVault(rootDir fs.Folder, kss kss.Set, addr string) (Vault, error)
 	if err != nil {
 		return nil, err
 	}
+	err = CreateFingerprint(rootDir, database, kss.PublicKey())
+	if err != nil {
+		return nil, err
+	}
 	return &vault{ControllerAPI: controller, Database: database}, nil
 }

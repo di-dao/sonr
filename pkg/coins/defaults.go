@@ -14,6 +14,7 @@ type coin struct {
 	Hrp    string `json:"hrp"`
 	Index  int64  `json:"index"`
 	Path   uint32 `json:"path"`
+	Method string `json:"method"`
 }
 
 // FormatAddress formats the address based on the coin
@@ -50,4 +51,9 @@ func (c *coin) GetHrp() string {
 // GetPath returns the coin path
 func (c *coin) GetPath() uint32 {
 	return c.Path
+}
+
+// GetMethod returns the DID method for the coin
+func (c *coin) GetMethod() string {
+	return c.Method
 }

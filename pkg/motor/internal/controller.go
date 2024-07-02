@@ -16,6 +16,8 @@ const (
 type ControllerAPI interface {
 	SignMessage(msg []byte) ([]byte, error)
 	VerifyMessage(msg []byte, sig []byte) (bool, error)
+	IssueMacaroon()
+	ValidateMacaroon()
 }
 
 type enclave struct {
@@ -46,6 +48,10 @@ func (e *enclave) VerifyMessage(msg []byte, sig []byte) (bool, error) {
 	}
 	return set.PublicKey().VerifySignature(msg, sig), nil
 }
+
+// TODO: issue and validate macaroons
+func (e *enclave) IssueMacaroon()    {}
+func (e *enclave) ValidateMacaroon() {}
 
 func recoverKeyshares(encl *enclave) (kss.Set, error) {
 	uzerBz, err := encl.UserKS.Read()

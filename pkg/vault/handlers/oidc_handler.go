@@ -35,7 +35,7 @@ func (p oidcHandler) HandleDiscovery(e echo.Context) error {
 		TokenEndpoint:                     baseURL + "/token",
 		UserinfoEndpoint:                  baseURL + "/userinfo",
 		JwksURI:                           baseURL + "/jwks", // You'll need to implement this endpoint
-		RegistrationEndpoint:              baseURL + "/register-passkey",
+		RegistrationEndpoint:              baseURL + "/register",
 		ScopesSupported:                   []string{"openid", "profile", "email"},
 		ResponseTypesSupported:            []string{"code"},
 		SubjectTypesSupported:             []string{"public"},

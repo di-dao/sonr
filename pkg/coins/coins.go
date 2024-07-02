@@ -14,6 +14,9 @@ type Coin interface {
 	// GetSymbol returns the coin symbol
 	GetSymbol() string
 
+	// GetMethod returns the coin DID method
+	GetMethod() string
+
 	// GetName returns the coin name
 	GetName() string
 }
@@ -33,6 +36,7 @@ var (
 		Path:   0x80000000,
 		Symbol: "BTC",
 		Hrp:    "bc",
+		Method: "btcr",
 	}
 
 	// Ethereum
@@ -41,6 +45,7 @@ var (
 		Index:  60,
 		Path:   0x8000003c,
 		Symbol: "ETH",
+		Method: "ethr",
 	}
 
 	// Sonr
@@ -50,6 +55,7 @@ var (
 		Path:   0x800002bf,
 		Symbol: "SNR",
 		Hrp:    "idx",
+		Method: "sonr",
 	}
 )
 

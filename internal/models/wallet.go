@@ -12,13 +12,14 @@ type Wallet struct {
 	gorm.Model
 	Address    string `json:"address"`
 	Controller string `json:"controller"`
-	PublicKey  []byte `json:"publicKey"`
-	Index      int    `json:"index"`
-	CoinType   int64  `json:"coinType"`
 	Name       string `json:"name"`
 	ChainID    string `json:"chainId"`
 	Network    string `json:"network"`
 	Label      string `json:"label"`
+	DID        string `json:"did"`
+	PublicKey  []byte `json:"publicKey"`
+	Index      int    `json:"index"`
+	CoinType   int64  `json:"coinType"`
 }
 
 // NewWallet creates a new account from a public key, coin, and index
