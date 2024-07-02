@@ -6,7 +6,7 @@ import (
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
 	"github.com/di-dao/sonr/internal/fs"
-	"github.com/di-dao/sonr/internal/models"
+	"github.com/di-dao/sonr/internal/orm"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
@@ -18,17 +18,17 @@ type Database interface {
 	ExistsProfile(did string) bool
 	ExistsWallet(did string) bool
 
-	GetCredential(did string) (*models.Credential, error)
-	GetProfile(did string) (*models.Profile, error)
-	GetWallet(did string) (*models.Wallet, error)
+	GetCredential(did string) (*orm.Credential, error)
+	GetProfile(did string) (*orm.Profile, error)
+	GetWallet(did string) (*orm.Wallet, error)
 
-	InsertCredentials(credentials ...*models.Credential) error
-	InsertProfiles(profiles ...*models.Profile) error
-	InsertWallets(wallets ...*models.Wallet) error
+	InsertCredentials(credentials ...*orm.Credential) error
+	InsertProfiles(profiles ...*orm.Profile) error
+	InsertWallets(wallets ...*orm.Wallet) error
 
-	ListCredentials() ([]*models.Credential, error)
-	ListProfiles() ([]*models.Profile, error)
-	ListWallets() ([]*models.Wallet, error)
+	ListCredentials() ([]*orm.Credential, error)
+	ListProfiles() ([]*orm.Profile, error)
+	ListWallets() ([]*orm.Wallet, error)
 
 	WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error)
 	WitnessProfile(publicKey crypto.PublicKey, did string) ([]byte, error)
@@ -44,7 +44,7 @@ func seedTables(dir fs.Folder) (Database, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(&models.Wallet{}, &models.Credential{}, &models.Profile{})
+	err = db.AutoMigrate(&orm.Wallet{}, &orm.Credential{}, &orm.Profile{})
 	if err != nil {
 		return nil, err
 	}
@@ -55,77 +55,77 @@ type embedDB struct {
 	DB *gorm.DB
 }
 
-func (db *embedDB) GetCredential(id string) (*models.Credential, error) {
-	credential := new(models.Credential)
+func (db *embedDB) GetCredential(id string) (*orm.Credential, error) {
+	credential := new(orm.Credential)
 	db.DB.First(&credential, "did = ?", id)
 	return credential, nil
 }
 
-func (db *embedDB) GetProfile(id string) (*models.Profile, error) {
-	profile := new(models.Profile)
+func (db *embedDB) GetProfile(id string) (*orm.Profile, error) {
+	profile := new(orm.Profile)
 	db.DB.First(&profile, "did = ?", id)
 	return profile, nil
 }
 
-func (db *embedDB) GetWallet(id string) (*models.Wallet, error) {
-	wallet := new(models.Wallet)
+func (db *embedDB) GetWallet(id string) (*orm.Wallet, error) {
+	wallet := new(orm.Wallet)
 	db.DB.First(&wallet, "did = ?", id)
 	return wallet, nil
 }
 
 func (db *embedDB) ExistsCredential(did string) bool {
 	var count int64
-	db.DB.Model(&models.Credential{}).Where("did = ?", did).Count(&count)
+	db.DB.Model(&orm.Credential{}).Where("did = ?", did).Count(&count)
 	return count > 0
 }
 
 func (db *embedDB) ExistsProfile(did string) bool {
 	var count int64
-	db.DB.Model(&models.Profile{}).Where("did = ?", did).Count(&count)
+	db.DB.Model(&orm.Profile{}).Where("did = ?", did).Count(&count)
 	return count > 0
 }
 
 func (db *embedDB) ExistsWallet(did string) bool {
 	var count int64
-	db.DB.Model(&models.Wallet{}).Where("did = ?", did).Count(&count)
+	db.DB.Model(&orm.Wallet{}).Where("did = ?", did).Count(&count)
 	return count > 0
 }
 
-func (db *embedDB) InsertCredentials(credentials ...*models.Credential) error {
+func (db *embedDB) InsertCredentials(credentials ...*orm.Credential) error {
 	for _, c := range credentials {
 		db.DB.Create(c)
 	}
 	return nil
 }
 
-func (db *embedDB) InsertProfiles(profiles ...*models.Profile) error {
+func (db *embedDB) InsertProfiles(profiles ...*orm.Profile) error {
 	for _, p := range profiles {
 		db.DB.Create(p)
 	}
 	return nil
 }
 
-func (db *embedDB) InsertWallets(wallets ...*models.Wallet) error {
+func (db *embedDB) InsertWallets(wallets ...*orm.Wallet) error {
 	for _, w := range wallets {
 		db.DB.Create(w)
 	}
 	return nil
 }
 
-func (db *embedDB) ListCredentials() ([]*models.Credential, error) {
-	var credentials []*models.Credential
+func (db *embedDB) ListCredentials() ([]*orm.Credential, error) {
+	var credentials []*orm.Credential
 	db.DB.Find(&credentials)
 	return credentials, nil
 }
 
-func (db *embedDB) ListProfiles() ([]*models.Profile, error) {
-	var profiles []*models.Profile
+func (db *embedDB) ListProfiles() ([]*orm.Profile, error) {
+	var profiles []*orm.Profile
 	db.DB.Find(&profiles)
 	return profiles, nil
 }
 
-func (db *embedDB) ListWallets() ([]*models.Wallet, error) {
-	var wallets []*models.Wallet
+func (db *embedDB) ListWallets() ([]*orm.Wallet, error) {
+	var wallets []*orm.Wallet
 	db.DB.Find(&wallets)
 	return wallets, nil
 }

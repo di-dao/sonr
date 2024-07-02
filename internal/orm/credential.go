@@ -1,4 +1,4 @@
-package models
+package orm
 
 import (
 	"github.com/go-webauthn/webauthn/protocol"

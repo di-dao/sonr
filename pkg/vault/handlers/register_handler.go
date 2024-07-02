@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/di-dao/sonr/internal/models"
+	"github.com/di-dao/sonr/internal/orm"
 	pages "github.com/di-dao/sonr/pkg/vault/components"
 	"github.com/di-dao/sonr/pkg/vault/middleware"
 	"github.com/go-webauthn/webauthn/protocol"
@@ -37,7 +37,7 @@ func (h registerHandler) Finish(e echo.Context) error {
 	}
 
 	// Create the Credential
-	credential := models.MakeNewCredential(parsedData)
+	credential := orm.MakeNewCredential(parsedData)
 
 	// Set additional fields
 	credential.DisplayName = ccr.ID      // You might want to set this to a more meaningful value

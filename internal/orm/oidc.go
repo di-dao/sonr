@@ -1,4 +1,4 @@
-package models
+package orm
 
 type UserInfo struct {
 	DID   string

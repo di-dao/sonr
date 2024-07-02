@@ -1,4 +1,4 @@
-package models
+package orm
 
 import (
 	"github.com/di-dao/sonr/crypto"
