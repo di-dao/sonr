@@ -1,6 +1,9 @@
 package internal
 
 import (
+	"github.com/di-dao/sonr/crypto"
+
+	"github.com/di-dao/sonr/crypto/secret"
 	"github.com/di-dao/sonr/internal/fs"
 	"github.com/di-dao/sonr/internal/models"
 	"github.com/glebarez/sqlite"
@@ -10,9 +13,13 @@ import (
 const kVaultDBFileName = "vault.db"
 
 type Database interface {
-	GetCredential(id string) (*models.Credential, error)
-	GetProfile(id string) (*models.Profile, error)
-	GetWallet(id string) (*models.Wallet, error)
+	ExistsCredential(did string) bool
+	ExistsProfile(did string) bool
+	ExistsWallet(did string) bool
+
+	GetCredential(did string) (*models.Credential, error)
+	GetProfile(did string) (*models.Profile, error)
+	GetWallet(did string) (*models.Wallet, error)
 
 	InsertCredentials(credentials ...*models.Credential) error
 	InsertProfiles(profiles ...*models.Profile) error
@@ -21,6 +28,10 @@ type Database interface {
 	ListCredentials() ([]*models.Credential, error)
 	ListProfiles() ([]*models.Profile, error)
 	ListWallets() ([]*models.Wallet, error)
+
+	WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error)
+	WitnessProfile(publicKey crypto.PublicKey, did string) ([]byte, error)
+	WitnessWallet(publicKey crypto.PublicKey, did string) ([]byte, error)
 }
 
 func seedTables(dir fs.Folder) (Database, error) {
@@ -98,4 +109,35 @@ func (db *embedDB) ListWallets() ([]*models.Wallet, error) {
 	var wallets []*models.Wallet
 	db.DB.Find(&wallets)
 	return wallets, nil
+}
+
+func (db *embedDB) WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error) {
+	// Verify that did exists in the table
+
+	pk, err := secret.NewKey("credentials", publicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	creds, err := db.ListCredentials()
+	if err != nil {
+		return nil, err
+	}
+
+	credIDStrs := make([]string, len(creds))
+	for i, c := range creds {
+		credIDStrs[i] = string(c.ID)
+	}
+
+	acc, err := pk.CreateAccumulator(credIDStrs...)
+
+	return nil, nil
+}
+
+func (db *embedDB) WitnessProfiles(publicKey crypto.PublicKey, did string) ([]byte, error) {
+	return nil, nil
+}
+
+func (db *embedDB) WitnessWallets(publicKey crypto.PublicKey, did string) ([]byte, error) {
+	return nil, nil
 }
