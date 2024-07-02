@@ -60,7 +60,7 @@ func (f File) Overwrite(data []byte) error {
 			return fmt.Errorf("failed to remove existing file: %w", err)
 		}
 	}
-	
+
 	// Write the new data
 	return os.WriteFile(string(f), data, 0644)
 }

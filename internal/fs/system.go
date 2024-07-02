@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/di-dao/sonr/internal/env"
 	"github.com/glebarez/sqlite"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
@@ -66,7 +67,7 @@ func SyncFolderToIPFS(ctx context.Context, f Folder) (path.Path, error) {
 	if err != nil {
 		return nil, err
 	}
-	c, err := getIPFSClient()
+	c, err := env.GetIPFSClient()
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +97,7 @@ func SyncFolderToIPFS(ctx context.Context, f Folder) (path.Path, error) {
 
 // PublishToIPNS publishes the Folder to IPNS
 func PublishToIPNS(ctx context.Context, ipfsPath path.Path, f Folder) error {
-	c, err := getIPFSClient()
+	c, err := env.GetIPFSClient()
 	if err != nil {
 		return err
 	}
@@ -117,7 +118,7 @@ func PublishToIPNS(ctx context.Context, ipfsPath path.Path, f Folder) error {
 
 // LoadFromIPFS loads a Folder from IPFS
 func LoadFromIPFS(ctx context.Context, path string) (Folder, error) {
-	c, err := getIPFSClient()
+	c, err := env.GetIPFSClient()
 	if err != nil {
 		return "", err
 	}

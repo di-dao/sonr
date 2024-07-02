@@ -5,7 +5,7 @@ import (
 	"github.com/di-dao/sonr/crypto/kss"
 	"github.com/di-dao/sonr/crypto/mpc"
 	"github.com/di-dao/sonr/internal/fs"
-	"github.com/di-dao/sonr/pkg/motor/internal"
+	"github.com/di-dao/sonr/pkg/dwn/internal"
 )
 
 const kSonrHRP = "idx"

@@ -6,9 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/di-dao/sonr/internal/local"
 	"github.com/ipfs/boxo/path"
-	"github.com/ipfs/kubo/client/rpc"
 )
 
 // Helper function to parse IPFS path
@@ -38,9 +36,4 @@ func OpenURL(url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// Helper function to get IPFS client
-func getIPFSClient() (*rpc.HttpApi, error) {
-	return local.GetIPFSClient()
 }

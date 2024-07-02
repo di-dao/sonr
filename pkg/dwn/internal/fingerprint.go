@@ -9,6 +9,7 @@ import (
 	"github.com/di-dao/sonr/internal/fs"
 )
 
+// CreateFingerprint creates a fingerprint for the given database and public key
 func CreateFingerprint(dir fs.Folder, db Database, publicKey crypto.PublicKey) error {
 	pk, err := secret.NewKey("credentials", publicKey)
 	if err != nil {
@@ -40,6 +41,7 @@ func CreateFingerprint(dir fs.Folder, db Database, publicKey crypto.PublicKey) e
 	return nil
 }
 
+// ValidateAndPurgeFingerprint validates the fingerprint and purges it if it's valid
 func ValidateAndPurgeFingerprint(dir fs.Folder, witness []byte, publicKey crypto.PublicKey) (bool, error) {
 	pk, err := secret.NewKey("credentials", publicKey)
 	if err != nil {
@@ -56,16 +58,19 @@ func ValidateAndPurgeFingerprint(dir fs.Folder, witness []byte, publicKey crypto
 	if err != nil {
 		return false, err
 	}
+
 	err = creds.UnmarshalBinary(bz)
 	if err != nil {
 		return false, err
 	}
+
 	if err := pk.VerifyWitness(creds, membership); err != nil {
 		return false, err
 	}
+
 	err = dir.DeleteFile("fingerprint")
 	if err != nil {
-		return true, err
+		return false, err
 	}
 	return true, nil
 }

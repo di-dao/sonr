@@ -1,4 +1,4 @@
-package local
+package env
 
 import (
 	"github.com/ipfs/kubo/client/rpc"
