@@ -12,9 +12,9 @@ type coin struct {
 	Name   string `json:"name"`
 	Symbol string `json:"symbol"`
 	Hrp    string `json:"hrp"`
+	Method string `json:"method"`
 	Index  int64  `json:"index"`
 	Path   uint32 `json:"path"`
-	Method string `json:"method"`
 }
 
 // FormatAddress formats the address based on the coin
