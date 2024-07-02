@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/di-dao/sonr/crypto"
+	"github.com/di-dao/sonr/crypto/accumulator"
 	"github.com/di-dao/sonr/crypto/secret"
 	"github.com/di-dao/sonr/internal/fs"
 )
@@ -37,4 +38,34 @@ func CreateFingerprint(dir fs.Folder, db Database, publicKey crypto.PublicKey) e
 		return err
 	}
 	return nil
+}
+
+func ValidateAndPurgeFingerprint(dir fs.Folder, witness []byte, publicKey crypto.PublicKey) (bool, error) {
+	pk, err := secret.NewKey("credentials", publicKey)
+	if err != nil {
+		return false, err
+	}
+	creds := new(accumulator.Accumulator)
+	membership := new(accumulator.MembershipWitness)
+	err = membership.UnmarshalBinary(witness)
+	if err != nil {
+		return false, err
+	}
+
+	bz, err := dir.ReadFile("fingerprint")
+	if err != nil {
+		return false, err
+	}
+	err = creds.UnmarshalBinary(bz)
+	if err != nil {
+		return false, err
+	}
+	if err := pk.VerifyWitness(creds, membership); err != nil {
+		return false, err
+	}
+	err = dir.DeleteFile("fingerprint")
+	if err != nil {
+		return true, err
+	}
+	return true, nil
 }
