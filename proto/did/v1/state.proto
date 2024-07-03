@@ -23,13 +23,7 @@ message Assertion {
   // The type of key associated with the assertion
   string key_type = 3;
 
-  // The transport methods associated with the assertion
-  repeated string transport = 4;
-
-  // The authenticator associated with the assertion
-  string authenticator = 5;
-
-  // The origin of the issuer associated with the assertion
+// The origin of the issuer associated with the assertion
   string origin = 6;
 
   // The controller of the assertion
