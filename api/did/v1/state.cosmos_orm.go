@@ -9,372 +9,492 @@ import (
 	ormerrors "cosmossdk.io/orm/types/ormerrors"
 )
 
-type AuthenticatorTable interface {
-	Insert(ctx context.Context, authenticator *Authenticator) error
-	Update(ctx context.Context, authenticator *Authenticator) error
-	Save(ctx context.Context, authenticator *Authenticator) error
-	Delete(ctx context.Context, authenticator *Authenticator) error
+type AttestationTable interface {
+	Insert(ctx context.Context, attestation *Attestation) error
+	Update(ctx context.Context, attestation *Attestation) error
+	Save(ctx context.Context, attestation *Attestation) error
+	Delete(ctx context.Context, attestation *Attestation) error
 	Has(ctx context.Context, id string) (found bool, err error)
 	// Get returns nil and an error which responds true to ormerrors.IsNotFound() if the record was not found.
-	Get(ctx context.Context, id string) (*Authenticator, error)
-	List(ctx context.Context, prefixKey AuthenticatorIndexKey, opts ...ormlist.Option) (AuthenticatorIterator, error)
-	ListRange(ctx context.Context, from, to AuthenticatorIndexKey, opts ...ormlist.Option) (AuthenticatorIterator, error)
-	DeleteBy(ctx context.Context, prefixKey AuthenticatorIndexKey) error
-	DeleteRange(ctx context.Context, from, to AuthenticatorIndexKey) error
+	Get(ctx context.Context, id string) (*Attestation, error)
+	List(ctx context.Context, prefixKey AttestationIndexKey, opts ...ormlist.Option) (AttestationIterator, error)
+	ListRange(ctx context.Context, from, to AttestationIndexKey, opts ...ormlist.Option) (AttestationIterator, error)
+	DeleteBy(ctx context.Context, prefixKey AttestationIndexKey) error
+	DeleteRange(ctx context.Context, from, to AttestationIndexKey) error
 
 	doNotImplement()
 }
 
-type AuthenticatorIterator struct {
+type AttestationIterator struct {
 	ormtable.Iterator
 }
 
-func (i AuthenticatorIterator) Value() (*Authenticator, error) {
-	var authenticator Authenticator
-	err := i.UnmarshalMessage(&authenticator)
-	return &authenticator, err
+func (i AttestationIterator) Value() (*Attestation, error) {
+	var attestation Attestation
+	err := i.UnmarshalMessage(&attestation)
+	return &attestation, err
 }
 
-type AuthenticatorIndexKey interface {
+type AttestationIndexKey interface {
 	id() uint32
 	values() []interface{}
-	authenticatorIndexKey()
+	attestationIndexKey()
 }
 
 // primary key starting index..
-type AuthenticatorPrimaryKey = AuthenticatorIdIndexKey
+type AttestationPrimaryKey = AttestationIdIndexKey
 
-type AuthenticatorIdIndexKey struct {
+type AttestationIdIndexKey struct {
 	vs []interface{}
 }
 
-func (x AuthenticatorIdIndexKey) id() uint32             { return 0 }
-func (x AuthenticatorIdIndexKey) values() []interface{}  { return x.vs }
-func (x AuthenticatorIdIndexKey) authenticatorIndexKey() {}
+func (x AttestationIdIndexKey) id() uint32            { return 0 }
+func (x AttestationIdIndexKey) values() []interface{} { return x.vs }
+func (x AttestationIdIndexKey) attestationIndexKey()  {}
 
-func (this AuthenticatorIdIndexKey) WithId(id string) AuthenticatorIdIndexKey {
+func (this AttestationIdIndexKey) WithId(id string) AttestationIdIndexKey {
 	this.vs = []interface{}{id}
 	return this
 }
 
-type authenticatorTable struct {
+type attestationTable struct {
 	table ormtable.Table
 }
 
-func (this authenticatorTable) Insert(ctx context.Context, authenticator *Authenticator) error {
-	return this.table.Insert(ctx, authenticator)
+func (this attestationTable) Insert(ctx context.Context, attestation *Attestation) error {
+	return this.table.Insert(ctx, attestation)
 }
 
-func (this authenticatorTable) Update(ctx context.Context, authenticator *Authenticator) error {
-	return this.table.Update(ctx, authenticator)
+func (this attestationTable) Update(ctx context.Context, attestation *Attestation) error {
+	return this.table.Update(ctx, attestation)
 }
 
-func (this authenticatorTable) Save(ctx context.Context, authenticator *Authenticator) error {
-	return this.table.Save(ctx, authenticator)
+func (this attestationTable) Save(ctx context.Context, attestation *Attestation) error {
+	return this.table.Save(ctx, attestation)
 }
 
-func (this authenticatorTable) Delete(ctx context.Context, authenticator *Authenticator) error {
-	return this.table.Delete(ctx, authenticator)
+func (this attestationTable) Delete(ctx context.Context, attestation *Attestation) error {
+	return this.table.Delete(ctx, attestation)
 }
 
-func (this authenticatorTable) Has(ctx context.Context, id string) (found bool, err error) {
+func (this attestationTable) Has(ctx context.Context, id string) (found bool, err error) {
 	return this.table.PrimaryKey().Has(ctx, id)
 }
 
-func (this authenticatorTable) Get(ctx context.Context, id string) (*Authenticator, error) {
-	var authenticator Authenticator
-	found, err := this.table.PrimaryKey().Get(ctx, &authenticator, id)
+func (this attestationTable) Get(ctx context.Context, id string) (*Attestation, error) {
+	var attestation Attestation
+	found, err := this.table.PrimaryKey().Get(ctx, &attestation, id)
 	if err != nil {
 		return nil, err
 	}
 	if !found {
 		return nil, ormerrors.NotFound
 	}
-	return &authenticator, nil
+	return &attestation, nil
 }
 
-func (this authenticatorTable) List(ctx context.Context, prefixKey AuthenticatorIndexKey, opts ...ormlist.Option) (AuthenticatorIterator, error) {
+func (this attestationTable) List(ctx context.Context, prefixKey AttestationIndexKey, opts ...ormlist.Option) (AttestationIterator, error) {
 	it, err := this.table.GetIndexByID(prefixKey.id()).List(ctx, prefixKey.values(), opts...)
-	return AuthenticatorIterator{it}, err
+	return AttestationIterator{it}, err
 }
 
-func (this authenticatorTable) ListRange(ctx context.Context, from, to AuthenticatorIndexKey, opts ...ormlist.Option) (AuthenticatorIterator, error) {
+func (this attestationTable) ListRange(ctx context.Context, from, to AttestationIndexKey, opts ...ormlist.Option) (AttestationIterator, error) {
 	it, err := this.table.GetIndexByID(from.id()).ListRange(ctx, from.values(), to.values(), opts...)
-	return AuthenticatorIterator{it}, err
+	return AttestationIterator{it}, err
 }
 
-func (this authenticatorTable) DeleteBy(ctx context.Context, prefixKey AuthenticatorIndexKey) error {
+func (this attestationTable) DeleteBy(ctx context.Context, prefixKey AttestationIndexKey) error {
 	return this.table.GetIndexByID(prefixKey.id()).DeleteBy(ctx, prefixKey.values()...)
 }
 
-func (this authenticatorTable) DeleteRange(ctx context.Context, from, to AuthenticatorIndexKey) error {
+func (this attestationTable) DeleteRange(ctx context.Context, from, to AttestationIndexKey) error {
 	return this.table.GetIndexByID(from.id()).DeleteRange(ctx, from.values(), to.values())
 }
 
-func (this authenticatorTable) doNotImplement() {}
+func (this attestationTable) doNotImplement() {}
 
-var _ AuthenticatorTable = authenticatorTable{}
+var _ AttestationTable = attestationTable{}
 
-func NewAuthenticatorTable(db ormtable.Schema) (AuthenticatorTable, error) {
-	table := db.GetTable(&Authenticator{})
+func NewAttestationTable(db ormtable.Schema) (AttestationTable, error) {
+	table := db.GetTable(&Attestation{})
 	if table == nil {
-		return nil, ormerrors.TableNotFound.Wrap(string((&Authenticator{}).ProtoReflect().Descriptor().FullName()))
+		return nil, ormerrors.TableNotFound.Wrap(string((&Attestation{}).ProtoReflect().Descriptor().FullName()))
 	}
-	return authenticatorTable{table}, nil
+	return attestationTable{table}, nil
 }
 
-type KeyshareTable interface {
-	Insert(ctx context.Context, keyshare *Keyshare) error
-	Update(ctx context.Context, keyshare *Keyshare) error
-	Save(ctx context.Context, keyshare *Keyshare) error
-	Delete(ctx context.Context, keyshare *Keyshare) error
+type ControllerTable interface {
+	Insert(ctx context.Context, controller *Controller) error
+	Update(ctx context.Context, controller *Controller) error
+	Save(ctx context.Context, controller *Controller) error
+	Delete(ctx context.Context, controller *Controller) error
 	Has(ctx context.Context, id string) (found bool, err error)
 	// Get returns nil and an error which responds true to ormerrors.IsNotFound() if the record was not found.
-	Get(ctx context.Context, id string) (*Keyshare, error)
-	List(ctx context.Context, prefixKey KeyshareIndexKey, opts ...ormlist.Option) (KeyshareIterator, error)
-	ListRange(ctx context.Context, from, to KeyshareIndexKey, opts ...ormlist.Option) (KeyshareIterator, error)
-	DeleteBy(ctx context.Context, prefixKey KeyshareIndexKey) error
-	DeleteRange(ctx context.Context, from, to KeyshareIndexKey) error
+	Get(ctx context.Context, id string) (*Controller, error)
+	List(ctx context.Context, prefixKey ControllerIndexKey, opts ...ormlist.Option) (ControllerIterator, error)
+	ListRange(ctx context.Context, from, to ControllerIndexKey, opts ...ormlist.Option) (ControllerIterator, error)
+	DeleteBy(ctx context.Context, prefixKey ControllerIndexKey) error
+	DeleteRange(ctx context.Context, from, to ControllerIndexKey) error
 
 	doNotImplement()
 }
 
-type KeyshareIterator struct {
+type ControllerIterator struct {
 	ormtable.Iterator
 }
 
-func (i KeyshareIterator) Value() (*Keyshare, error) {
-	var keyshare Keyshare
-	err := i.UnmarshalMessage(&keyshare)
-	return &keyshare, err
+func (i ControllerIterator) Value() (*Controller, error) {
+	var controller Controller
+	err := i.UnmarshalMessage(&controller)
+	return &controller, err
 }
 
-type KeyshareIndexKey interface {
+type ControllerIndexKey interface {
 	id() uint32
 	values() []interface{}
-	keyshareIndexKey()
+	controllerIndexKey()
 }
 
 // primary key starting index..
-type KeysharePrimaryKey = KeyshareIdIndexKey
+type ControllerPrimaryKey = ControllerIdIndexKey
 
-type KeyshareIdIndexKey struct {
+type ControllerIdIndexKey struct {
 	vs []interface{}
 }
 
-func (x KeyshareIdIndexKey) id() uint32            { return 0 }
-func (x KeyshareIdIndexKey) values() []interface{} { return x.vs }
-func (x KeyshareIdIndexKey) keyshareIndexKey()     {}
+func (x ControllerIdIndexKey) id() uint32            { return 0 }
+func (x ControllerIdIndexKey) values() []interface{} { return x.vs }
+func (x ControllerIdIndexKey) controllerIndexKey()   {}
 
-func (this KeyshareIdIndexKey) WithId(id string) KeyshareIdIndexKey {
+func (this ControllerIdIndexKey) WithId(id string) ControllerIdIndexKey {
 	this.vs = []interface{}{id}
 	return this
 }
 
-type keyshareTable struct {
+type controllerTable struct {
 	table ormtable.Table
 }
 
-func (this keyshareTable) Insert(ctx context.Context, keyshare *Keyshare) error {
-	return this.table.Insert(ctx, keyshare)
+func (this controllerTable) Insert(ctx context.Context, controller *Controller) error {
+	return this.table.Insert(ctx, controller)
 }
 
-func (this keyshareTable) Update(ctx context.Context, keyshare *Keyshare) error {
-	return this.table.Update(ctx, keyshare)
+func (this controllerTable) Update(ctx context.Context, controller *Controller) error {
+	return this.table.Update(ctx, controller)
 }
 
-func (this keyshareTable) Save(ctx context.Context, keyshare *Keyshare) error {
-	return this.table.Save(ctx, keyshare)
+func (this controllerTable) Save(ctx context.Context, controller *Controller) error {
+	return this.table.Save(ctx, controller)
 }
 
-func (this keyshareTable) Delete(ctx context.Context, keyshare *Keyshare) error {
-	return this.table.Delete(ctx, keyshare)
+func (this controllerTable) Delete(ctx context.Context, controller *Controller) error {
+	return this.table.Delete(ctx, controller)
 }
 
-func (this keyshareTable) Has(ctx context.Context, id string) (found bool, err error) {
+func (this controllerTable) Has(ctx context.Context, id string) (found bool, err error) {
 	return this.table.PrimaryKey().Has(ctx, id)
 }
 
-func (this keyshareTable) Get(ctx context.Context, id string) (*Keyshare, error) {
-	var keyshare Keyshare
-	found, err := this.table.PrimaryKey().Get(ctx, &keyshare, id)
+func (this controllerTable) Get(ctx context.Context, id string) (*Controller, error) {
+	var controller Controller
+	found, err := this.table.PrimaryKey().Get(ctx, &controller, id)
 	if err != nil {
 		return nil, err
 	}
 	if !found {
 		return nil, ormerrors.NotFound
 	}
-	return &keyshare, nil
+	return &controller, nil
 }
 
-func (this keyshareTable) List(ctx context.Context, prefixKey KeyshareIndexKey, opts ...ormlist.Option) (KeyshareIterator, error) {
+func (this controllerTable) List(ctx context.Context, prefixKey ControllerIndexKey, opts ...ormlist.Option) (ControllerIterator, error) {
 	it, err := this.table.GetIndexByID(prefixKey.id()).List(ctx, prefixKey.values(), opts...)
-	return KeyshareIterator{it}, err
+	return ControllerIterator{it}, err
 }
 
-func (this keyshareTable) ListRange(ctx context.Context, from, to KeyshareIndexKey, opts ...ormlist.Option) (KeyshareIterator, error) {
+func (this controllerTable) ListRange(ctx context.Context, from, to ControllerIndexKey, opts ...ormlist.Option) (ControllerIterator, error) {
 	it, err := this.table.GetIndexByID(from.id()).ListRange(ctx, from.values(), to.values(), opts...)
-	return KeyshareIterator{it}, err
+	return ControllerIterator{it}, err
 }
 
-func (this keyshareTable) DeleteBy(ctx context.Context, prefixKey KeyshareIndexKey) error {
+func (this controllerTable) DeleteBy(ctx context.Context, prefixKey ControllerIndexKey) error {
 	return this.table.GetIndexByID(prefixKey.id()).DeleteBy(ctx, prefixKey.values()...)
 }
 
-func (this keyshareTable) DeleteRange(ctx context.Context, from, to KeyshareIndexKey) error {
+func (this controllerTable) DeleteRange(ctx context.Context, from, to ControllerIndexKey) error {
 	return this.table.GetIndexByID(from.id()).DeleteRange(ctx, from.values(), to.values())
 }
 
-func (this keyshareTable) doNotImplement() {}
+func (this controllerTable) doNotImplement() {}
 
-var _ KeyshareTable = keyshareTable{}
+var _ ControllerTable = controllerTable{}
 
-func NewKeyshareTable(db ormtable.Schema) (KeyshareTable, error) {
-	table := db.GetTable(&Keyshare{})
+func NewControllerTable(db ormtable.Schema) (ControllerTable, error) {
+	table := db.GetTable(&Controller{})
 	if table == nil {
-		return nil, ormerrors.TableNotFound.Wrap(string((&Keyshare{}).ProtoReflect().Descriptor().FullName()))
+		return nil, ormerrors.TableNotFound.Wrap(string((&Controller{}).ProtoReflect().Descriptor().FullName()))
 	}
-	return keyshareTable{table}, nil
+	return controllerTable{table}, nil
 }
 
-type ProofTable interface {
-	Insert(ctx context.Context, proof *Proof) error
-	Update(ctx context.Context, proof *Proof) error
-	Save(ctx context.Context, proof *Proof) error
-	Delete(ctx context.Context, proof *Proof) error
+type DelegationTable interface {
+	Insert(ctx context.Context, delegation *Delegation) error
+	Update(ctx context.Context, delegation *Delegation) error
+	Save(ctx context.Context, delegation *Delegation) error
+	Delete(ctx context.Context, delegation *Delegation) error
 	Has(ctx context.Context, id string) (found bool, err error)
 	// Get returns nil and an error which responds true to ormerrors.IsNotFound() if the record was not found.
-	Get(ctx context.Context, id string) (*Proof, error)
-	List(ctx context.Context, prefixKey ProofIndexKey, opts ...ormlist.Option) (ProofIterator, error)
-	ListRange(ctx context.Context, from, to ProofIndexKey, opts ...ormlist.Option) (ProofIterator, error)
-	DeleteBy(ctx context.Context, prefixKey ProofIndexKey) error
-	DeleteRange(ctx context.Context, from, to ProofIndexKey) error
+	Get(ctx context.Context, id string) (*Delegation, error)
+	List(ctx context.Context, prefixKey DelegationIndexKey, opts ...ormlist.Option) (DelegationIterator, error)
+	ListRange(ctx context.Context, from, to DelegationIndexKey, opts ...ormlist.Option) (DelegationIterator, error)
+	DeleteBy(ctx context.Context, prefixKey DelegationIndexKey) error
+	DeleteRange(ctx context.Context, from, to DelegationIndexKey) error
 
 	doNotImplement()
 }
 
-type ProofIterator struct {
+type DelegationIterator struct {
 	ormtable.Iterator
 }
 
-func (i ProofIterator) Value() (*Proof, error) {
-	var proof Proof
-	err := i.UnmarshalMessage(&proof)
-	return &proof, err
+func (i DelegationIterator) Value() (*Delegation, error) {
+	var delegation Delegation
+	err := i.UnmarshalMessage(&delegation)
+	return &delegation, err
 }
 
-type ProofIndexKey interface {
+type DelegationIndexKey interface {
 	id() uint32
 	values() []interface{}
-	proofIndexKey()
+	delegationIndexKey()
 }
 
 // primary key starting index..
-type ProofPrimaryKey = ProofIdIndexKey
+type DelegationPrimaryKey = DelegationIdIndexKey
 
-type ProofIdIndexKey struct {
+type DelegationIdIndexKey struct {
 	vs []interface{}
 }
 
-func (x ProofIdIndexKey) id() uint32            { return 0 }
-func (x ProofIdIndexKey) values() []interface{} { return x.vs }
-func (x ProofIdIndexKey) proofIndexKey()        {}
+func (x DelegationIdIndexKey) id() uint32            { return 0 }
+func (x DelegationIdIndexKey) values() []interface{} { return x.vs }
+func (x DelegationIdIndexKey) delegationIndexKey()   {}
 
-func (this ProofIdIndexKey) WithId(id string) ProofIdIndexKey {
+func (this DelegationIdIndexKey) WithId(id string) DelegationIdIndexKey {
 	this.vs = []interface{}{id}
 	return this
 }
 
-type proofTable struct {
+type delegationTable struct {
 	table ormtable.Table
 }
 
-func (this proofTable) Insert(ctx context.Context, proof *Proof) error {
-	return this.table.Insert(ctx, proof)
+func (this delegationTable) Insert(ctx context.Context, delegation *Delegation) error {
+	return this.table.Insert(ctx, delegation)
 }
 
-func (this proofTable) Update(ctx context.Context, proof *Proof) error {
-	return this.table.Update(ctx, proof)
+func (this delegationTable) Update(ctx context.Context, delegation *Delegation) error {
+	return this.table.Update(ctx, delegation)
 }
 
-func (this proofTable) Save(ctx context.Context, proof *Proof) error {
-	return this.table.Save(ctx, proof)
+func (this delegationTable) Save(ctx context.Context, delegation *Delegation) error {
+	return this.table.Save(ctx, delegation)
 }
 
-func (this proofTable) Delete(ctx context.Context, proof *Proof) error {
-	return this.table.Delete(ctx, proof)
+func (this delegationTable) Delete(ctx context.Context, delegation *Delegation) error {
+	return this.table.Delete(ctx, delegation)
 }
 
-func (this proofTable) Has(ctx context.Context, id string) (found bool, err error) {
+func (this delegationTable) Has(ctx context.Context, id string) (found bool, err error) {
 	return this.table.PrimaryKey().Has(ctx, id)
 }
 
-func (this proofTable) Get(ctx context.Context, id string) (*Proof, error) {
-	var proof Proof
-	found, err := this.table.PrimaryKey().Get(ctx, &proof, id)
+func (this delegationTable) Get(ctx context.Context, id string) (*Delegation, error) {
+	var delegation Delegation
+	found, err := this.table.PrimaryKey().Get(ctx, &delegation, id)
 	if err != nil {
 		return nil, err
 	}
 	if !found {
 		return nil, ormerrors.NotFound
 	}
-	return &proof, nil
+	return &delegation, nil
 }
 
-func (this proofTable) List(ctx context.Context, prefixKey ProofIndexKey, opts ...ormlist.Option) (ProofIterator, error) {
+func (this delegationTable) List(ctx context.Context, prefixKey DelegationIndexKey, opts ...ormlist.Option) (DelegationIterator, error) {
 	it, err := this.table.GetIndexByID(prefixKey.id()).List(ctx, prefixKey.values(), opts...)
-	return ProofIterator{it}, err
+	return DelegationIterator{it}, err
 }
 
-func (this proofTable) ListRange(ctx context.Context, from, to ProofIndexKey, opts ...ormlist.Option) (ProofIterator, error) {
+func (this delegationTable) ListRange(ctx context.Context, from, to DelegationIndexKey, opts ...ormlist.Option) (DelegationIterator, error) {
 	it, err := this.table.GetIndexByID(from.id()).ListRange(ctx, from.values(), to.values(), opts...)
-	return ProofIterator{it}, err
+	return DelegationIterator{it}, err
 }
 
-func (this proofTable) DeleteBy(ctx context.Context, prefixKey ProofIndexKey) error {
+func (this delegationTable) DeleteBy(ctx context.Context, prefixKey DelegationIndexKey) error {
 	return this.table.GetIndexByID(prefixKey.id()).DeleteBy(ctx, prefixKey.values()...)
 }
 
-func (this proofTable) DeleteRange(ctx context.Context, from, to ProofIndexKey) error {
+func (this delegationTable) DeleteRange(ctx context.Context, from, to DelegationIndexKey) error {
 	return this.table.GetIndexByID(from.id()).DeleteRange(ctx, from.values(), to.values())
 }
 
-func (this proofTable) doNotImplement() {}
+func (this delegationTable) doNotImplement() {}
 
-var _ ProofTable = proofTable{}
+var _ DelegationTable = delegationTable{}
 
-func NewProofTable(db ormtable.Schema) (ProofTable, error) {
-	table := db.GetTable(&Proof{})
+func NewDelegationTable(db ormtable.Schema) (DelegationTable, error) {
+	table := db.GetTable(&Delegation{})
 	if table == nil {
-		return nil, ormerrors.TableNotFound.Wrap(string((&Proof{}).ProtoReflect().Descriptor().FullName()))
+		return nil, ormerrors.TableNotFound.Wrap(string((&Delegation{}).ProtoReflect().Descriptor().FullName()))
 	}
-	return proofTable{table}, nil
+	return delegationTable{table}, nil
+}
+
+type ServiceTable interface {
+	Insert(ctx context.Context, service *Service) error
+	Update(ctx context.Context, service *Service) error
+	Save(ctx context.Context, service *Service) error
+	Delete(ctx context.Context, service *Service) error
+	Has(ctx context.Context, id string) (found bool, err error)
+	// Get returns nil and an error which responds true to ormerrors.IsNotFound() if the record was not found.
+	Get(ctx context.Context, id string) (*Service, error)
+	List(ctx context.Context, prefixKey ServiceIndexKey, opts ...ormlist.Option) (ServiceIterator, error)
+	ListRange(ctx context.Context, from, to ServiceIndexKey, opts ...ormlist.Option) (ServiceIterator, error)
+	DeleteBy(ctx context.Context, prefixKey ServiceIndexKey) error
+	DeleteRange(ctx context.Context, from, to ServiceIndexKey) error
+
+	doNotImplement()
+}
+
+type ServiceIterator struct {
+	ormtable.Iterator
+}
+
+func (i ServiceIterator) Value() (*Service, error) {
+	var service Service
+	err := i.UnmarshalMessage(&service)
+	return &service, err
+}
+
+type ServiceIndexKey interface {
+	id() uint32
+	values() []interface{}
+	serviceIndexKey()
+}
+
+// primary key starting index..
+type ServicePrimaryKey = ServiceIdIndexKey
+
+type ServiceIdIndexKey struct {
+	vs []interface{}
+}
+
+func (x ServiceIdIndexKey) id() uint32            { return 0 }
+func (x ServiceIdIndexKey) values() []interface{} { return x.vs }
+func (x ServiceIdIndexKey) serviceIndexKey()      {}
+
+func (this ServiceIdIndexKey) WithId(id string) ServiceIdIndexKey {
+	this.vs = []interface{}{id}
+	return this
+}
+
+type serviceTable struct {
+	table ormtable.Table
+}
+
+func (this serviceTable) Insert(ctx context.Context, service *Service) error {
+	return this.table.Insert(ctx, service)
+}
+
+func (this serviceTable) Update(ctx context.Context, service *Service) error {
+	return this.table.Update(ctx, service)
+}
+
+func (this serviceTable) Save(ctx context.Context, service *Service) error {
+	return this.table.Save(ctx, service)
+}
+
+func (this serviceTable) Delete(ctx context.Context, service *Service) error {
+	return this.table.Delete(ctx, service)
+}
+
+func (this serviceTable) Has(ctx context.Context, id string) (found bool, err error) {
+	return this.table.PrimaryKey().Has(ctx, id)
+}
+
+func (this serviceTable) Get(ctx context.Context, id string) (*Service, error) {
+	var service Service
+	found, err := this.table.PrimaryKey().Get(ctx, &service, id)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, ormerrors.NotFound
+	}
+	return &service, nil
+}
+
+func (this serviceTable) List(ctx context.Context, prefixKey ServiceIndexKey, opts ...ormlist.Option) (ServiceIterator, error) {
+	it, err := this.table.GetIndexByID(prefixKey.id()).List(ctx, prefixKey.values(), opts...)
+	return ServiceIterator{it}, err
+}
+
+func (this serviceTable) ListRange(ctx context.Context, from, to ServiceIndexKey, opts ...ormlist.Option) (ServiceIterator, error) {
+	it, err := this.table.GetIndexByID(from.id()).ListRange(ctx, from.values(), to.values(), opts...)
+	return ServiceIterator{it}, err
+}
+
+func (this serviceTable) DeleteBy(ctx context.Context, prefixKey ServiceIndexKey) error {
+	return this.table.GetIndexByID(prefixKey.id()).DeleteBy(ctx, prefixKey.values()...)
+}
+
+func (this serviceTable) DeleteRange(ctx context.Context, from, to ServiceIndexKey) error {
+	return this.table.GetIndexByID(from.id()).DeleteRange(ctx, from.values(), to.values())
+}
+
+func (this serviceTable) doNotImplement() {}
+
+var _ ServiceTable = serviceTable{}
+
+func NewServiceTable(db ormtable.Schema) (ServiceTable, error) {
+	table := db.GetTable(&Service{})
+	if table == nil {
+		return nil, ormerrors.TableNotFound.Wrap(string((&Service{}).ProtoReflect().Descriptor().FullName()))
+	}
+	return serviceTable{table}, nil
 }
 
 type StateStore interface {
-	AuthenticatorTable() AuthenticatorTable
-	KeyshareTable() KeyshareTable
-	ProofTable() ProofTable
+	AttestationTable() AttestationTable
+	ControllerTable() ControllerTable
+	DelegationTable() DelegationTable
+	ServiceTable() ServiceTable
 
 	doNotImplement()
 }
 
 type stateStore struct {
-	authenticator AuthenticatorTable
-	keyshare      KeyshareTable
-	proof         ProofTable
+	attestation AttestationTable
+	controller  ControllerTable
+	delegation  DelegationTable
+	service     ServiceTable
 }
 
-func (x stateStore) AuthenticatorTable() AuthenticatorTable {
-	return x.authenticator
+func (x stateStore) AttestationTable() AttestationTable {
+	return x.attestation
 }
 
-func (x stateStore) KeyshareTable() KeyshareTable {
-	return x.keyshare
+func (x stateStore) ControllerTable() ControllerTable {
+	return x.controller
 }
 
-func (x stateStore) ProofTable() ProofTable {
-	return x.proof
+func (x stateStore) DelegationTable() DelegationTable {
+	return x.delegation
+}
+
+func (x stateStore) ServiceTable() ServiceTable {
+	return x.service
 }
 
 func (stateStore) doNotImplement() {}
@@ -382,24 +502,30 @@ func (stateStore) doNotImplement() {}
 var _ StateStore = stateStore{}
 
 func NewStateStore(db ormtable.Schema) (StateStore, error) {
-	authenticatorTable, err := NewAuthenticatorTable(db)
+	attestationTable, err := NewAttestationTable(db)
 	if err != nil {
 		return nil, err
 	}
 
-	keyshareTable, err := NewKeyshareTable(db)
+	controllerTable, err := NewControllerTable(db)
 	if err != nil {
 		return nil, err
 	}
 
-	proofTable, err := NewProofTable(db)
+	delegationTable, err := NewDelegationTable(db)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceTable, err := NewServiceTable(db)
 	if err != nil {
 		return nil, err
 	}
 
 	return stateStore{
-		authenticatorTable,
-		keyshareTable,
-		proofTable,
+		attestationTable,
+		controllerTable,
+		delegationTable,
+		serviceTable,
 	}, nil
 }

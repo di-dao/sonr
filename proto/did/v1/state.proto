@@ -11,15 +11,13 @@ message Attestation {
   option (cosmos.orm.v1.table) = {
     id: 1
     primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "controller"}
   };
 
   // The unique identifier of the attestation
   string id = 1;
 
   // The type of the linked identifier (e.g., "crypto", "github", "email", "phone")
-  string type = 2;
+  string key_type = 2;
 
   // The value of the linked identifier
   string value = 3;
@@ -36,8 +34,6 @@ message Controller {
   option (cosmos.orm.v1.table) = {
     id: 2
     primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "did", unique: true}
   };
 
   // The unique identifier of the controller
@@ -61,8 +57,6 @@ message Delegation {
   option (cosmos.orm.v1.table) = {
     id: 3
     primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "controller_did, chain_type"}
   };
 
   // The unique identifier of the delegation
@@ -92,15 +86,13 @@ message Service {
   option (cosmos.orm.v1.table) = {
     id: 4
     primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "controller_did"}
   };
 
   // The ID of the service
   string id = 1;
 
   // The type of the service
-  string type = 2;
+  string service_type = 2;
 
   // The service endpoint
   string service_endpoint = 3;
