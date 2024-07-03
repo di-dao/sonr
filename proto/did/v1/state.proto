@@ -6,84 +6,6 @@ option go_package = "github.com/di-dao/sonr/x/did/types";
 import "cosmos/orm/v1/orm.proto";
 import "did/v1/genesis.proto";
 
-// DIDDocument represents a DID Document
-message DIDDocument {
-  option (cosmos.orm.v1.table) = {
-    id: 1
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-  };
-
-  // The DID of the document
-  string id = 1;
-
-  // The controller of the DID Document
-  repeated string controller = 2;
-
-  // The verification methods associated with the DID
-  repeated VerificationMethod verification_method = 3;
-
-  // The authentication methods
-  repeated string authentication = 4;
-
-  // The assertion methods
-  repeated string assertion_method = 5;
-
-  // The key agreement methods
-  repeated string key_agreement = 6;
-
-  // The capability invocation methods
-  repeated string capability_invocation = 7;
-
-  // The capability delegation methods
-  repeated string capability_delegation = 8;
-
-  // The services associated with the DID
-  repeated Service service = 9;
-
-  // Also Known As
-  repeated string also_known_as = 10;
-}
-
-// VerificationMethod represents a verification method in a DID Document
-message VerificationMethod {
-  option (cosmos.orm.v1.table) = {
-    id: 2
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-  };
-
-  // The ID of the verification method
-  string id = 1;
-
-  // The type of the verification method
-  string type = 2;
-
-  // The controller of the verification method
-  string controller = 3;
-
-  // The public key in multibase format
-  string public_key_multibase = 4;
-}
-
-// Service represents a service in a DID Document
-message Service {
-  option (cosmos.orm.v1.table) = {
-    id: 3
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-  };
-
-  // The ID of the service
-  string id = 1;
-
-  // The type of the service
-  string type = 2;
-
-  // The service endpoint
-  string service_endpoint = 3;
-}
-
 // Attestation represents linked identifiers (e.g., Crypto Accounts, Github, Email, Phone)
 message Attestation {
   option (cosmos.orm.v1.table) = {
@@ -126,7 +48,10 @@ message Controller {
   PublicKey public_key = 3;
 
   // The vault address or identifier
-  string vault_address = 4;
+  string vault_cid = 4;
+
+  // Fingerprint is the Accumulator of discrete credential identifiers
+  bytes fingerprint = 5;
 }
 
 // Delegation represents IBC Account Controllers for various chains (e.g., ETH, BTC)
@@ -150,5 +75,26 @@ message Delegation {
   string controller_did = 4;
 
   // The delegation proof or verification method
-  string proof = 5;
+  PublicKey public_key = 5;
+
+  // IBC Channel ID
+  uint64 channel_id = 6;
+}
+
+// Service represents a service in a DID Document
+message Service {
+  option (cosmos.orm.v1.table) = {
+    id: 3
+    primary_key: {fields: "id"}
+    index: {id: 1, fields: "id", unique: true}
+  };
+
+  // The ID of the service
+  string id = 1;
+
+  // The type of the service
+  string type = 2;
+
+  // The service endpoint
+  string service_endpoint = 3;
 }
