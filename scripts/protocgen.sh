@@ -21,6 +21,22 @@ done
 echo "Generating pulsar proto code"
 buf generate --template buf.gen.pulsar.yaml
 
+echo "Generating ORM proto code"
+for dir in $proto_dirs; do
+  for file in $(find "${dir}" -maxdepth 1 -name '*.proto'); do
+    if grep -q "import \"cosmos/orm/v1/orm.proto\";" "$file"; then
+      protoc \
+        -I . \
+        -I $(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-sdk) \
+        -I $(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-proto) \
+        --go_out=.. \
+        --go-cosmos-orm_out=.. \
+        --go-grpc_out=.. \
+        $file
+    fi
+  done
+done
+
 cd ..
 
 cp -r $GO_MOD_PACKAGE/* ./
