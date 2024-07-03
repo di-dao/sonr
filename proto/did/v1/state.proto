@@ -9,9 +9,10 @@ import "did/v1/genesis.proto";
 // Attestation represents linked identifiers (e.g., Crypto Accounts, Github, Email, Phone)
 message Attestation {
   option (cosmos.orm.v1.table) = {
-    id: 4
+    id: 1
     primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
+    index: {id: 2, fields: "controller"}
   };
 
   // The unique identifier of the attestation
@@ -33,9 +34,10 @@ message Attestation {
 // Controller represents a Sonr DWN Vault
 message Controller {
   option (cosmos.orm.v1.table) = {
-    id: 5
+    id: 2
     primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
+    index: {id: 2, fields: "did", unique: true}
   };
 
   // The unique identifier of the controller
@@ -57,9 +59,10 @@ message Controller {
 // Delegation represents IBC Account Controllers for various chains (e.g., ETH, BTC)
 message Delegation {
   option (cosmos.orm.v1.table) = {
-    id: 6
+    id: 3
     primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
+    index: {id: 2, fields: "controller_did, chain_type"}
   };
 
   // The unique identifier of the delegation
@@ -84,9 +87,10 @@ message Delegation {
 // Service represents a service in a DID Document
 message Service {
   option (cosmos.orm.v1.table) = {
-    id: 3
+    id: 4
     primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
+    index: {id: 2, fields: "controller_did"}
   };
 
   // The ID of the service
@@ -97,4 +101,7 @@ message Service {
 
   // The service endpoint
   string service_endpoint = 3;
+
+  // The controller DID of the service
+  string controller_did = 4;
 }
