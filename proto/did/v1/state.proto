@@ -6,88 +6,101 @@ option go_package = "github.com/di-dao/sonr/x/did/types";
 import "cosmos/orm/v1/orm.proto";
 import "did/v1/genesis.proto";
 
-
-// Authenticator is the representation of a Credential Assertion.
-message Authenticator {
+// Assertion represents keys and credentials
+message Assertion {
   option (cosmos.orm.v1.table) = {
-    id : 1
-    primary_key : {fields : "id"}
+    id: 1
+    primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
   };
 
-  // The unique identifier of the assertion.
+  // The unique identifier of the assertion
   string id = 1;
 
-  // The public key associated with the assertion.
+  // The public key associated with the assertion
   PublicKey public_key = 2;
 
-  // The type of key associated with the assertion.
+  // The type of key associated with the assertion
   string key_type = 3;
 
-  // The transport methods associated with the assertion.
+  // The transport methods associated with the assertion
   repeated string transport = 4;
 
-  // The authenticator associated with the assertion.
+  // The authenticator associated with the assertion
   string authenticator = 5;
 
-  // The origin of the issuer associated with the assertion.
+  // The origin of the issuer associated with the assertion
   string origin = 6;
 
-  // The index associated with the assertion.
-  uint64 index = 8;
-
-  // The controller of the assertion.
-  string controller = 9;
+  // The controller of the assertion
+  string controller = 7;
 }
 
-
-// Keyshare is the generated MPC share references.
-message Keyshare {
+// Attestation represents linked identifiers (e.g., Crypto Accounts, Github, Email, Phone)
+message Attestation {
   option (cosmos.orm.v1.table) = {
     id: 2
-    primary_key : {fields : "id"}
+    primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
   };
 
-  // The unique identifier of the keyshare.
+  // The unique identifier of the attestation
   string id = 1;
 
-  // The public key associated with the keyshare.
-  PublicKey public_key = 2;
+  // The type of the linked identifier (e.g., "crypto", "github", "email", "phone")
+  string type = 2;
 
-  // The type of key associated with the keyshare.
-  string key_type = 3;
+  // The value of the linked identifier
+  string value = 3;
 
-  // The validator address associated with the keyshare.
-  string val_address = 4;
+  // The proof or verification method for this attestation
+  string proof = 4;
 
-  // The index associated with the keyshare.
-  uint64 index = 5;
-
-  // The controller of the keyshare.
-  string controller = 6;
+  // The controller of the attestation
+  string controller = 5;
 }
 
-// Proof is the zero-knowledge proof for properties of the keyshare.
-message Proof {
+// Controller represents a Sonr DWN Vault
+message Controller {
   option (cosmos.orm.v1.table) = {
-    id : 4
-    primary_key : {fields : "id"}
+    id: 3
+    primary_key: {fields: "id"}
     index: {id: 1, fields: "id", unique: true}
   };
 
-  // The unique identifier of the proof.
+  // The unique identifier of the controller
   string id = 1;
 
-  // The public key associated with the proof.
-  PublicKey public_key = 2;
+  // The DID of the controller
+  string did = 2;
 
-  // The type of key associated with the proof.
-  string key_type = 3;
+  // The public key of the controller
+  PublicKey public_key = 3;
 
-  // The witness associated with the proof.
-  string witness = 4;
+  // The vault address or identifier
+  string vault_address = 4;
+}
 
-  // The controller of the proof.
-  string controller = 5;
+// Delegation represents IBC Account Controllers for various chains (e.g., ETH, BTC)
+message Delegation {
+  option (cosmos.orm.v1.table) = {
+    id: 4
+    primary_key: {fields: "id"}
+    index: {id: 1, fields: "id", unique: true}
+  };
+
+  // The unique identifier of the delegation
+  string id = 1;
+
+  // The chain type (e.g., "ETH", "BTC")
+  string chain_type = 2;
+
+  // The address on the target chain
+  string chain_address = 3;
+
+  // The controller DID
+  string controller_did = 4;
+
+  // The delegation proof or verification method
+  string proof = 5;
 }
