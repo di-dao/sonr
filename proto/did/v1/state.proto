@@ -68,20 +68,23 @@ message Delegation {
   // The unique identifier of the delegation
   string id = 1;
 
+  // The Decentralized Identifier of the delegated account
+  string did = 2;
+
   // The chain type (e.g., "ETH", "BTC")
-  string chain_type = 2;
+  string chain_type = 3;
 
   // The address on the target chain
-  string chain_address = 3;
+  string chain_address = 4;
 
   // The controller DID
-  string controller_did = 4;
+  string controller_did = 5;
 
   // The delegation proof or verification method
-  PublicKey public_key = 5;
+  PublicKey public_key = 6;
 
   // IBC Channel ID
-  uint64 channel_id = 6;
+  uint64 channel_id = 7;
 }
 
 // Service represents a service in a DID Document
