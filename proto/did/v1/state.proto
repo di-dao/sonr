@@ -12,6 +12,7 @@ message Authenticator {
   option (cosmos.orm.v1.table) = {
     id : 1
     primary_key : {fields : "id"}
+    index: {id: 1, fields: "id", unique: true}
   };
 
   // The unique identifier of the assertion.
@@ -45,6 +46,7 @@ message Keyshare {
   option (cosmos.orm.v1.table) = {
     id: 2
     primary_key : {fields : "id"}
+    index: {id: 1, fields: "id", unique: true}
   };
 
   // The unique identifier of the keyshare.
@@ -71,6 +73,7 @@ message Proof {
   option (cosmos.orm.v1.table) = {
     id : 4
     primary_key : {fields : "id"}
+    index: {id: 1, fields: "id", unique: true}
   };
 
   // The unique identifier of the proof.
