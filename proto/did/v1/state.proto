@@ -10,13 +10,12 @@ import "did/v1/genesis.proto";
 message Attestation {
   option (cosmos.orm.v1.table) = {
     id: 1
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "controller"}
+    primary_key: {fields: "id", auto_increment: true}
+    index: {id: 1, fields: "controller_did"}
   };
 
   // The unique identifier of the attestation
-  string id = 1;
+  uint64 id = 1;
 
   // The type of the linked identifier (e.g., "crypto", "github", "email", "phone")
   string type = 2;
@@ -28,20 +27,19 @@ message Attestation {
   string proof = 4;
 
   // The controller of the attestation
-  string controller = 5;
+  string controller_did = 5;
 }
 
 // Controller represents a Sonr DWN Vault
 message Controller {
   option (cosmos.orm.v1.table) = {
     id: 2
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "did", unique: true}
+    primary_key: {fields: "id", auto_increment: true}
+    index: {id: 1, fields: "did", unique: true}
   };
 
   // The unique identifier of the controller
-  string id = 1;
+  uint64 id = 1;
 
   // The DID of the controller
   string did = 2;
@@ -60,13 +58,13 @@ message Controller {
 message Delegation {
   option (cosmos.orm.v1.table) = {
     id: 3
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "controller_did, chain_type"}
+    primary_key: {fields: "id", auto_increment: true}
+    index: {id: 1, fields: "controller_did, chain_type"}
+    index: {id: 2, fields: "did"}
   };
 
   // The unique identifier of the delegation
-  string id = 1;
+  uint64 id = 1;
 
   // The Decentralized Identifier of the delegated account
   string did = 2;
@@ -91,13 +89,12 @@ message Delegation {
 message Service {
   option (cosmos.orm.v1.table) = {
     id: 4
-    primary_key: {fields: "id"}
-    index: {id: 1, fields: "id", unique: true}
-    index: {id: 2, fields: "controller_did"}
+    primary_key: {fields: "id", auto_increment: true}
+    index: {id: 1, fields: "controller_did"}
   };
 
   // The ID of the service
-  string id = 1;
+  uint64 id = 1;
 
   // The type of the service
   string type = 2;
