@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/di-dao/sonr/crypto"
-	"github.com/di-dao/sonr/internal/fs"
+	fs "github.com/di-dao/sonr/internal/vfs"
 	"github.com/ipfs/boxo/path"
 )
 

@@ -2,7 +2,7 @@ package internal
 
 import (
 	"github.com/di-dao/sonr/crypto/kss"
-	"github.com/di-dao/sonr/internal/fs"
+	fs "github.com/di-dao/sonr/internal/vfs"
 )
 
 type Vault interface {

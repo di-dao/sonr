@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/di-dao/sonr/crypto/kss"
 	"github.com/di-dao/sonr/crypto/mpc"
-	"github.com/di-dao/sonr/internal/fs"
+	fs "github.com/di-dao/sonr/internal/vfs"
 	"github.com/di-dao/sonr/pkg/dwn/internal"
 )
 

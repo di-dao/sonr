@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"github.com/di-dao/sonr/internal/fs"
 	"github.com/di-dao/sonr/internal/orm"
+	fs "github.com/di-dao/sonr/internal/vfs"
 )
 
 type Status interface{}

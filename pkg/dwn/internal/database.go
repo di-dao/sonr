@@ -5,8 +5,8 @@ import (
 
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
-	"github.com/di-dao/sonr/internal/fs"
 	"github.com/di-dao/sonr/internal/orm"
+	fs "github.com/di-dao/sonr/internal/vfs"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )

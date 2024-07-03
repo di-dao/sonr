@@ -6,7 +6,7 @@ import (
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/accumulator"
 	"github.com/di-dao/sonr/crypto/secret"
-	"github.com/di-dao/sonr/internal/fs"
+	fs "github.com/di-dao/sonr/internal/vfs"
 )
 
 // CreateFingerprint creates a fingerprint for the given database and public key
