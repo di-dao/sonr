@@ -1,4 +1,4 @@
-package dwn
+package main
 
 import (
 	"os"

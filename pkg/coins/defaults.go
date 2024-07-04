@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/types/bech32"
-	ethcommon "github.com/ethereum/go-ethereum/common"
-	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 type coin struct {
@@ -21,9 +19,6 @@ type coin struct {
 func (c *coin) FormatAddress(pubKey []byte) (string, error) {
 	if c.Hrp != "" {
 		return bech32.ConvertAndEncode(c.Hrp, pubKey)
-	}
-	if c.Index == 60 {
-		return ethcommon.BytesToAddress(ethcrypto.Keccak256(pubKey[1:])[12:]).Hex(), nil
 	}
 	return "", fmt.Errorf("unsupported coin")
 }

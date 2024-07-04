@@ -1,4 +1,4 @@
-package dwn
+package main
 
 import (
 	"github.com/di-dao/sonr/crypto/kss"
@@ -21,10 +21,6 @@ func InitializeVault(rootDir fs.Folder, kss kss.Set, addr string) (Vault, error)
 		return nil, err
 	}
 	database, err := seedTables(rootDir)
-	if err != nil {
-		return nil, err
-	}
-	err = CreateFingerprint(rootDir, database, kss.PublicKey())
 	if err != nil {
 		return nil, err
 	}

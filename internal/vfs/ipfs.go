@@ -2,13 +2,10 @@ package vfs
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/di-dao/sonr/internal/env"
-	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
 	"github.com/ipfs/kubo/core/coreiface/options"
 )
@@ -16,8 +13,8 @@ import (
 // Constant for the name of the folder where the vaults are stored
 const kVaultsFolderName = ".sonr-vaults"
 
-// VaultsFolder is the folder where the vaults are stored
-var VaultsFolder Folder
+// enclaveRoot is the folder where the vaults are stored
+var enclaveRoot Folder
 
 // Package initializes the VaultsFolder
 func init() {
@@ -28,9 +25,9 @@ func init() {
 	}
 
 	// Create the folder if it does not exist
-	VaultsFolder = NewFolder(filepath.Join(homeDir, kVaultsFolderName))
-	if !VaultsFolder.Exists() {
-		if err := VaultsFolder.Create(); err != nil {
+	enclaveRoot = NewFolder(filepath.Join(homeDir, kVaultsFolderName))
+	if !enclaveRoot.Exists() {
+		if err := enclaveRoot.Create(); err != nil {
 			panic(err)
 		}
 	}
@@ -38,7 +35,7 @@ func init() {
 
 // NewVaultFolder creates a new folder under the VaultsFolder directory
 func NewVaultFolder(name string) (Folder, error) {
-	vaultFolder := VaultsFolder.Join(name)
+	vaultFolder := enclaveRoot.Join(name)
 	err := vaultFolder.Create()
 	if err != nil {
 		return "", err
@@ -93,41 +90,4 @@ func LoadFromIPFS(ctx context.Context, path string) (Folder, error) {
 		return "", err
 	}
 	return LoadNodeInFolder(path, node)
-}
-
-// LoadNodeInFolder loads an IPFS node into a Folder
-func LoadNodeInFolder(path string, node files.Node) (Folder, error) {
-	folder := NewFolder(path)
-	if err := folder.Create(); err != nil {
-		return "", err
-	}
-
-	switch n := node.(type) {
-	case files.File:
-		f, err := os.Create(folder.Path())
-		if err != nil {
-			return "", err
-		}
-		defer f.Close()
-		if _, err := io.Copy(f, n); err != nil {
-			return "", err
-		}
-	case files.Directory:
-		entries := n.Entries()
-		for entries.Next() {
-			name := entries.Name()
-			childNode := entries.Node()
-			childPath := filepath.Join(folder.Path(), name)
-			if _, err := LoadNodeInFolder(childPath, childNode); err != nil {
-				return "", err
-			}
-		}
-		if entries.Err() != nil {
-			return "", entries.Err()
-		}
-	default:
-		return "", fmt.Errorf("unsupported node type: %T", n)
-	}
-
-	return folder, nil
 }

@@ -21,3 +21,7 @@ tasks:
 
   build:sonrd:
     cmd: go build -o ./bin/sonrd ./cmd/sonrd
+
+  build:wasm:
+    dir: internal/dwn
+    cmd: tinygo build -o ./cmd/assets/motor.wasm ./db.go

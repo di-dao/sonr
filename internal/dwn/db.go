@@ -1,4 +1,4 @@
-package dwn
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,9 @@ import (
 	"github.com/di-dao/sonr/crypto/secret"
 	"github.com/di-dao/sonr/internal/orm"
 	fs "github.com/di-dao/sonr/internal/vfs"
-	"github.com/glebarez/sqlite"
+
+	_ "github.com/ncruces/go-sqlite3/embed"
+	"github.com/ncruces/go-sqlite3/gormlite"
 	"gorm.io/gorm"
 )
 
@@ -36,11 +38,7 @@ type Database interface {
 }
 
 func seedTables(dir fs.Folder) (Database, error) {
-	file, err := dir.Touch(kVaultDBFileName)
-	if err != nil {
-		return nil, err
-	}
-	db, err := gorm.Open(sqlite.Open(file.Path()), &gorm.Config{})
+	db, err := gorm.Open(gormlite.Open(kVaultDBFileName), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
