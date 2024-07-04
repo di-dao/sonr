@@ -1,4 +1,4 @@
-package fs
+package vfs
 
 import (
 	"time"
@@ -7,15 +7,15 @@ import (
 )
 
 type FSEntry struct {
-	gorm.Model
-	LocalPath       string
-	IPFSPath        string
-	Address         string
-	Synced          bool
-	Encrypted       bool
-	Published       bool
 	LastSyncTime    time.Time
 	LastPublishTime time.Time
+	gorm.Model
+	LocalPath string
+	IPFSPath  string
+	Address   string
+	Synced    bool
+	Encrypted bool
+	Published bool
 }
 
 func CreateFSEntry(f Folder) *FSEntry {

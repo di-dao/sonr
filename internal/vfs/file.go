@@ -1,4 +1,4 @@
-package fs
+package vfs
 
 import (
 	"fmt"
