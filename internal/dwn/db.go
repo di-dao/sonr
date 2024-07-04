@@ -6,10 +6,9 @@ import (
 
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
-	fs "github.com/di-dao/sonr/pkg/vfs"
 
-	_ "github.com/ncruces/go-sqlite3/embed"
 	_ "github.com/ncruces/go-sqlite3"
+	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
 const kVaultDBFileName = "vault.db"
@@ -30,42 +29,37 @@ type Database interface {
 	ListCredentials() ([]*Credential, error)
 	ListProfiles() ([]*Profile, error)
 	ListWallets() ([]*Wallet, error)
-
-	WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error)
-	WitnessProfile(publicKey crypto.PublicKey, did string) ([]byte, error)
-	WitnessWallet(publicKey crypto.PublicKey, did string) ([]byte, error)
 }
 
 type Credential struct {
-	ID              int64
-	DisplayName     string
+	Transport       string
 	Origin          string
 	Controller      string
-	AttestationType string
 	DID             string
-	CredentialID    []byte
+	DisplayName     string
+	AttestationType string
+	Attachment      string
+	AAGUID          []byte
 	PublicKey       []byte
-	Transport       string
-	UserPresent     bool
-	UserVerified    bool
+	CredentialID    []byte
+	ID              int64
+	SignCount       uint32
 	BackupEligible  bool
 	BackupState     bool
-	AAGUID          []byte
-	SignCount       uint32
-	Attachment      string
+	UserVerified    bool
+	UserPresent     bool
 }
 
 type Profile struct {
-	ID          int64
 	DID         string
 	DisplayName string
 	Name        string
 	Origin      string
 	Controller  string
+	ID          int64
 }
 
 type Wallet struct {
-	ID         int64
 	Address    string
 	Controller string
 	Name       string
@@ -74,11 +68,12 @@ type Wallet struct {
 	Label      string
 	DID        string
 	PublicKey  []byte
+	ID         int64
 	Index      int
 	CoinType   int64
 }
 
-func seedTables(dir fs.Folder) (Database, error) {
+func seedDB() (Database, error) {
 	db, err := sql.Open("sqlite3", kVaultDBFileName)
 	if err != nil {
 		return nil, err
