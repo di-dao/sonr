@@ -5,8 +5,8 @@ import (
 
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
-	"github.com/di-dao/sonr/internal/orm"
-	fs "github.com/di-dao/sonr/internal/vfs"
+	"github.com/di-dao/sonr/pkg/orm"
+	fs "github.com/di-dao/sonr/pkg/vfs"
 
 	_ "github.com/ncruces/go-sqlite3/embed"
 	"github.com/ncruces/go-sqlite3/gormlite"
