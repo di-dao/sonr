@@ -1,4 +1,4 @@
-package internal
+package dwn
 
 import (
 	"github.com/di-dao/sonr/crypto/kss"
