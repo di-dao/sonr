@@ -21,3 +21,6 @@ tasks:
 
   build:sonrd:
     cmd: go build -o ./bin/sonrd ./cmd/sonrd
+
+  build:dwn:
+    cmd: tinygo build -o ./bin/dwn.wasm -target wasi ./internal/dwn/db.go

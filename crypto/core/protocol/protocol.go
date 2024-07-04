@@ -38,19 +38,10 @@ const (
 // Message provides serializers and deserializer for the inputs and outputs of each step of the protocol.
 // Moreover, it adds some metadata and versioning around the serialized data.
 type Message struct {
-	// Protocol indicates whether this is a dkg or sign protocol.
-	Protocol string
-
-	// Version specifies the version of the protocol. We use a single version for changes in the protocol logic and/or
-	// its serialization.
-	Version uint
-
-	// Payloads is a mapping of the serialized data to the recipient. An example of key to this map is "broadcast" vs
-	// the shamir id of a peer.
 	Payloads map[string][]byte
-
-	// Metadata contain optional metadata for each round of the protocol, for example the round name or number.
 	Metadata map[string]string
+	Protocol string
+	Version  uint
 }
 
 // Iterator an interface for the DKLs18 protocols that follows the iterator pattern.

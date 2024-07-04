@@ -1,3 +1,5 @@
+//go:build (linux || darwin || windows || freebsd || illumos) && !sqlite3_nosys
+
 package main
 
 import (
@@ -7,10 +9,11 @@ import (
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/ncruces/go-sqlite3/driver"
+	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
-const kVaultDBFileName = "vault.db"
+const kVaultDBFileName = "file:demo.db?_pragma=busy_timeout(10000)"
 
 type Database interface {
 	ExistsCredential(did string) bool
@@ -441,3 +444,5 @@ func (db *embedDB) WitnessWallet(publicKey crypto.PublicKey, did string) ([]byte
 	}
 	return witness.MarshalBinary()
 }
+
+func main() {}
