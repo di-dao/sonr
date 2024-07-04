@@ -1,16 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
-	"github.com/di-dao/sonr/pkg/orm"
 	fs "github.com/di-dao/sonr/pkg/vfs"
 
 	_ "github.com/ncruces/go-sqlite3/embed"
-	"github.com/ncruces/go-sqlite3/gormlite"
-	"gorm.io/gorm"
+	_ "github.com/ncruces/go-sqlite3"
 )
 
 const kVaultDBFileName = "vault.db"
@@ -20,116 +19,340 @@ type Database interface {
 	ExistsProfile(did string) bool
 	ExistsWallet(did string) bool
 
-	GetCredential(did string) (*orm.Credential, error)
-	GetProfile(did string) (*orm.Profile, error)
-	GetWallet(did string) (*orm.Wallet, error)
+	GetCredential(did string) (*Credential, error)
+	GetProfile(did string) (*Profile, error)
+	GetWallet(did string) (*Wallet, error)
 
-	InsertCredentials(credentials ...*orm.Credential) error
-	InsertProfiles(profiles ...*orm.Profile) error
-	InsertWallets(wallets ...*orm.Wallet) error
+	InsertCredentials(credentials ...*Credential) error
+	InsertProfiles(profiles ...*Profile) error
+	InsertWallets(wallets ...*Wallet) error
 
-	ListCredentials() ([]*orm.Credential, error)
-	ListProfiles() ([]*orm.Profile, error)
-	ListWallets() ([]*orm.Wallet, error)
+	ListCredentials() ([]*Credential, error)
+	ListProfiles() ([]*Profile, error)
+	ListWallets() ([]*Wallet, error)
 
 	WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error)
 	WitnessProfile(publicKey crypto.PublicKey, did string) ([]byte, error)
 	WitnessWallet(publicKey crypto.PublicKey, did string) ([]byte, error)
 }
 
+type Credential struct {
+	ID              int64
+	DisplayName     string
+	Origin          string
+	Controller      string
+	AttestationType string
+	DID             string
+	CredentialID    []byte
+	PublicKey       []byte
+	Transport       string
+	UserPresent     bool
+	UserVerified    bool
+	BackupEligible  bool
+	BackupState     bool
+	AAGUID          []byte
+	SignCount       uint32
+	Attachment      string
+}
+
+type Profile struct {
+	ID          int64
+	DID         string
+	DisplayName string
+	Name        string
+	Origin      string
+	Controller  string
+}
+
+type Wallet struct {
+	ID         int64
+	Address    string
+	Controller string
+	Name       string
+	ChainID    string
+	Network    string
+	Label      string
+	DID        string
+	PublicKey  []byte
+	Index      int
+	CoinType   int64
+}
+
 func seedTables(dir fs.Folder) (Database, error) {
-	db, err := gorm.Open(gormlite.Open(kVaultDBFileName), &gorm.Config{})
+	db, err := sql.Open("sqlite3", kVaultDBFileName)
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(&orm.Wallet{}, &orm.Credential{}, &orm.Profile{})
+
+	// Create tables
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS credentials (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			display_name TEXT,
+			origin TEXT,
+			controller TEXT,
+			attestation_type TEXT,
+			did TEXT UNIQUE,
+			credential_id BLOB,
+			public_key BLOB,
+			transport TEXT,
+			user_present BOOLEAN,
+			user_verified BOOLEAN,
+			backup_eligible BOOLEAN,
+			backup_state BOOLEAN,
+			aaguid BLOB,
+			sign_count INTEGER,
+			attachment TEXT
+		);
+
+		CREATE TABLE IF NOT EXISTS profiles (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			did TEXT UNIQUE,
+			display_name TEXT,
+			name TEXT,
+			origin TEXT,
+			controller TEXT
+		);
+
+		CREATE TABLE IF NOT EXISTS wallets (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			address TEXT,
+			controller TEXT,
+			name TEXT,
+			chain_id TEXT,
+			network TEXT,
+			label TEXT,
+			did TEXT UNIQUE,
+			public_key BLOB,
+			index_num INTEGER,
+			coin_type INTEGER
+		);
+	`)
 	if err != nil {
 		return nil, err
 	}
+
 	return &embedDB{DB: db}, nil
 }
 
 type embedDB struct {
-	DB *gorm.DB
+	DB *sql.DB
 }
 
-func (db *embedDB) GetCredential(id string) (*orm.Credential, error) {
-	credential := new(orm.Credential)
-	db.DB.First(&credential, "did = ?", id)
+func (db *embedDB) GetCredential(did string) (*Credential, error) {
+	credential := new(Credential)
+	err := db.DB.QueryRow("SELECT * FROM credentials WHERE did = ?", did).Scan(
+		&credential.ID, &credential.DisplayName, &credential.Origin, &credential.Controller,
+		&credential.AttestationType, &credential.DID, &credential.CredentialID, &credential.PublicKey,
+		&credential.Transport, &credential.UserPresent, &credential.UserVerified,
+		&credential.BackupEligible, &credential.BackupState, &credential.AAGUID,
+		&credential.SignCount, &credential.Attachment,
+	)
+	if err != nil {
+		return nil, err
+	}
 	return credential, nil
 }
 
-func (db *embedDB) GetProfile(id string) (*orm.Profile, error) {
-	profile := new(orm.Profile)
-	db.DB.First(&profile, "did = ?", id)
+func (db *embedDB) GetProfile(did string) (*Profile, error) {
+	profile := new(Profile)
+	err := db.DB.QueryRow("SELECT * FROM profiles WHERE did = ?", did).Scan(
+		&profile.ID, &profile.DID, &profile.DisplayName, &profile.Name,
+		&profile.Origin, &profile.Controller,
+	)
+	if err != nil {
+		return nil, err
+	}
 	return profile, nil
 }
 
-func (db *embedDB) GetWallet(id string) (*orm.Wallet, error) {
-	wallet := new(orm.Wallet)
-	db.DB.First(&wallet, "did = ?", id)
+func (db *embedDB) GetWallet(did string) (*Wallet, error) {
+	wallet := new(Wallet)
+	err := db.DB.QueryRow("SELECT * FROM wallets WHERE did = ?", did).Scan(
+		&wallet.ID, &wallet.Address, &wallet.Controller, &wallet.Name,
+		&wallet.ChainID, &wallet.Network, &wallet.Label, &wallet.DID,
+		&wallet.PublicKey, &wallet.Index, &wallet.CoinType,
+	)
+	if err != nil {
+		return nil, err
+	}
 	return wallet, nil
 }
 
 func (db *embedDB) ExistsCredential(did string) bool {
-	var count int64
-	db.DB.Model(&orm.Credential{}).Where("did = ?", did).Count(&count)
+	var count int
+	db.DB.QueryRow("SELECT COUNT(*) FROM credentials WHERE did = ?", did).Scan(&count)
 	return count > 0
 }
 
 func (db *embedDB) ExistsProfile(did string) bool {
-	var count int64
-	db.DB.Model(&orm.Profile{}).Where("did = ?", did).Count(&count)
+	var count int
+	db.DB.QueryRow("SELECT COUNT(*) FROM profiles WHERE did = ?", did).Scan(&count)
 	return count > 0
 }
 
 func (db *embedDB) ExistsWallet(did string) bool {
-	var count int64
-	db.DB.Model(&orm.Wallet{}).Where("did = ?", did).Count(&count)
+	var count int
+	db.DB.QueryRow("SELECT COUNT(*) FROM wallets WHERE did = ?", did).Scan(&count)
 	return count > 0
 }
 
-func (db *embedDB) InsertCredentials(credentials ...*orm.Credential) error {
+func (db *embedDB) InsertCredentials(credentials ...*Credential) error {
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO credentials (
+			display_name, origin, controller, attestation_type, did, credential_id,
+			public_key, transport, user_present, user_verified, backup_eligible,
+			backup_state, aaguid, sign_count, attachment
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
 	for _, c := range credentials {
-		db.DB.Create(c)
+		_, err = stmt.Exec(
+			c.DisplayName, c.Origin, c.Controller, c.AttestationType, c.DID, c.CredentialID,
+			c.PublicKey, c.Transport, c.UserPresent, c.UserVerified, c.BackupEligible,
+			c.BackupState, c.AAGUID, c.SignCount, c.Attachment,
+		)
+		if err != nil {
+			return err
+		}
 	}
-	return nil
+
+	return tx.Commit()
 }
 
-func (db *embedDB) InsertProfiles(profiles ...*orm.Profile) error {
+func (db *embedDB) InsertProfiles(profiles ...*Profile) error {
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO profiles (did, display_name, name, origin, controller)
+		VALUES (?, ?, ?, ?, ?)
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
 	for _, p := range profiles {
-		db.DB.Create(p)
+		_, err = stmt.Exec(p.DID, p.DisplayName, p.Name, p.Origin, p.Controller)
+		if err != nil {
+			return err
+		}
 	}
-	return nil
+
+	return tx.Commit()
 }
 
-func (db *embedDB) InsertWallets(wallets ...*orm.Wallet) error {
+func (db *embedDB) InsertWallets(wallets ...*Wallet) error {
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO wallets (
+			address, controller, name, chain_id, network, label, did,
+			public_key, index_num, coin_type
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
 	for _, w := range wallets {
-		db.DB.Create(w)
+		_, err = stmt.Exec(
+			w.Address, w.Controller, w.Name, w.ChainID, w.Network, w.Label, w.DID,
+			w.PublicKey, w.Index, w.CoinType,
+		)
+		if err != nil {
+			return err
+		}
 	}
-	return nil
+
+	return tx.Commit()
 }
 
-func (db *embedDB) ListCredentials() ([]*orm.Credential, error) {
-	var credentials []*orm.Credential
-	db.DB.Find(&credentials)
+func (db *embedDB) ListCredentials() ([]*Credential, error) {
+	rows, err := db.DB.Query("SELECT * FROM credentials")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var credentials []*Credential
+	for rows.Next() {
+		c := new(Credential)
+		err := rows.Scan(
+			&c.ID, &c.DisplayName, &c.Origin, &c.Controller, &c.AttestationType,
+			&c.DID, &c.CredentialID, &c.PublicKey, &c.Transport, &c.UserPresent,
+			&c.UserVerified, &c.BackupEligible, &c.BackupState, &c.AAGUID,
+			&c.SignCount, &c.Attachment,
+		)
+		if err != nil {
+			return nil, err
+		}
+		credentials = append(credentials, c)
+	}
 	return credentials, nil
 }
 
-func (db *embedDB) ListProfiles() ([]*orm.Profile, error) {
-	var profiles []*orm.Profile
-	db.DB.Find(&profiles)
+func (db *embedDB) ListProfiles() ([]*Profile, error) {
+	rows, err := db.DB.Query("SELECT * FROM profiles")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var profiles []*Profile
+	for rows.Next() {
+		p := new(Profile)
+		err := rows.Scan(&p.ID, &p.DID, &p.DisplayName, &p.Name, &p.Origin, &p.Controller)
+		if err != nil {
+			return nil, err
+		}
+		profiles = append(profiles, p)
+	}
 	return profiles, nil
 }
 
-func (db *embedDB) ListWallets() ([]*orm.Wallet, error) {
-	var wallets []*orm.Wallet
-	db.DB.Find(&wallets)
+func (db *embedDB) ListWallets() ([]*Wallet, error) {
+	rows, err := db.DB.Query("SELECT * FROM wallets")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var wallets []*Wallet
+	for rows.Next() {
+		w := new(Wallet)
+		err := rows.Scan(
+			&w.ID, &w.Address, &w.Controller, &w.Name, &w.ChainID, &w.Network,
+			&w.Label, &w.DID, &w.PublicKey, &w.Index, &w.CoinType,
+		)
+		if err != nil {
+			return nil, err
+		}
+		wallets = append(wallets, w)
+	}
 	return wallets, nil
 }
 
 func (db *embedDB) WitnessCredential(publicKey crypto.PublicKey, did string) ([]byte, error) {
-	// Verify that did exists in the table
 	if !db.ExistsCredential(did) {
 		return nil, fmt.Errorf("credential with DID %s does not exist", did)
 	}
@@ -162,7 +385,6 @@ func (db *embedDB) WitnessCredential(publicKey crypto.PublicKey, did string) ([]
 }
 
 func (db *embedDB) WitnessProfile(publicKey crypto.PublicKey, did string) ([]byte, error) {
-	// Verify that did exists in the table
 	if !db.ExistsProfile(did) {
 		return nil, fmt.Errorf("profile with DID %s does not exist", did)
 	}
@@ -195,7 +417,6 @@ func (db *embedDB) WitnessProfile(publicKey crypto.PublicKey, did string) ([]byt
 }
 
 func (db *embedDB) WitnessWallet(publicKey crypto.PublicKey, did string) ([]byte, error) {
-	// Verify that did exists in the table
 	if !db.ExistsWallet(did) {
 		return nil, fmt.Errorf("wallet with DID %s does not exist", did)
 	}
