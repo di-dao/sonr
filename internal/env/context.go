@@ -9,14 +9,6 @@ import (
 // Default Key in gRPC Metadata for the Session ID
 const MetadataSessionIDKey = "sonr-session-id"
 
-// contextKey is a type for the context key
-type contextKey string
-
-// String returns the context key as a string
-func (c contextKey) String() string {
-	return "local-context/" + string(c)
-}
-
 // SonrContext is the context for the Sonr API
 type SonrContext struct {
 	Context          context.Context

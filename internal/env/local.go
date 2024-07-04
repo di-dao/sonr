@@ -5,10 +5,9 @@ import (
 )
 
 var (
-	chainID           = "testnet"
-	valAddr           = "val1"
-	nodeDir           = ".sonr"
-	contextSessionKey = contextKey("session-id")
+	ChainID = "testnet"
+	ValAddr = "val1"
+	NodeDir = ".sonr"
 )
 
 // Initialize initializes the local configuration values
@@ -17,12 +16,12 @@ func init() {
 
 // SetLocalContextSessionID sets the session ID for the local context
 func SetLocalValidatorAddress(address string) {
-	valAddr = address
+	ValAddr = address
 }
 
 // SetLocalContextChainID sets the chain ID for the local
 func SetLocalChainID(id string) {
-	chainID = id
+	ChainID = id
 }
 
 // IPFSClient is an interface for interacting with an IPFS node.
