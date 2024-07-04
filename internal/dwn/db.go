@@ -7,8 +7,7 @@ import (
 	"github.com/di-dao/sonr/crypto"
 	"github.com/di-dao/sonr/crypto/secret"
 
-	_ "github.com/ncruces/go-sqlite3"
-	_ "github.com/ncruces/go-sqlite3/embed"
+	_ "modernc.org/sqlite"
 )
 
 const kVaultDBFileName = "vault.db"
@@ -74,7 +73,7 @@ type Wallet struct {
 }
 
 func seedDB() (Database, error) {
-	db, err := sql.Open("sqlite3", kVaultDBFileName)
+	db, err := sql.Open("sqlite", kVaultDBFileName)
 	if err != nil {
 		return nil, err
 	}
